@@ -92,6 +92,24 @@ bool char_vector_prepend(char_vector v, char item)
     return true;
 }
 
+bool char_vector_insert(char_vector v, size_t index, char item)
+{
+    if (v->length >= v->capacity) {
+        if (!char_vector_resize(v, v->capacity * 2)) {
+            return false;
+        }
+    }
+
+    size_t i;
+    for (i = v->length - 1; i > index; i--) {
+        v->array[i] = v->array[i + 1];
+    }
+
+    v->array[index] = item;
+    v->length++;
+    return true;
+}
+
 bool char_vector_expand(char_vector v, size_t increase, char item)
 {
     if (v->length + increase >= v->capacity) {

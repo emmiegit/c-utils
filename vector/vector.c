@@ -83,6 +83,24 @@ bool vector_prepend(vector v, void *item)
     return true;
 }
 
+bool vector_insert(vector v, size_t index, void *item)
+{
+    if (v->length >= v->capacity) {
+        if (!vector_resize(v, v->capacity * 2)) {
+            return false;
+        }
+    }
+
+    size_t i;
+    for (i = v->length - 1; i > index; i--) {
+        v->array[i] = v->array[i + 1];
+    }
+
+    v->array[index] = item;
+    v->length++;
+    return true;
+}
+
 bool vector_expand(vector v, size_t increase, void *item)
 {
     if (v->length + increase >= v->capacity) {

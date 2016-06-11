@@ -38,6 +38,7 @@ void char_vector_destroy(char_vector v);
 void char_vector_clear(char_vector v);
 bool char_vector_append(char_vector v, char item);
 bool char_vector_prepend(char_vector v, char item);
+bool char_vector_insert(char_vector v, size_t index, char item);
 bool char_vector_expand(char_vector v, size_t increase, char item);
 bool char_vector_shrink(char_vector v, size_t decrease);
 char char_vector_get(char_vector v, size_t index, bool *success);

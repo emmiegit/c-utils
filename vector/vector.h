@@ -38,6 +38,7 @@ void vector_destroy(vector v);
 void vector_clear(vector v);
 bool vector_append(vector v, void *item);
 bool vector_prepend(vector v, void *item);
+bool vector_insert(vector v, size_t index, void *item);
 bool vector_expand(vector v, size_t increase, void *item);
 bool vector_shrink(vector v, size_t decrease);
 void *vector_get(vector v, size_t index, bool *success);
