@@ -164,6 +164,14 @@ bool vector_remove(vector v, size_t index)
     return true;
 }
 
+void vector_for_each(vector v, void (*f)(size_t, void *))
+{
+    size_t i;
+    for (i = 0; i < v->length; i++) {
+        f(i, v->array[i]);
+    }
+}
+
 vector vector_resize(vector v, size_t new_capacity)
 {
     if (v->length > new_capacity) {

@@ -304,6 +304,23 @@ const long *str_hashmap_list_values(str_hashmap map)
     return array;
 }
 
+void str_hashmap_for_each(str_hashmap map, void (*f)(const char *, long))
+{
+    struct str_hashentry_st *entry;
+    size_t i;
+    for (i = 0; i < map->capacity; i++) {
+        entry = &map->items[i];
+        if (!entry->is_empty) {
+            f(entry->key, entry->value);
+
+            while (entry->overflow && !entry->overflow->is_empty) {
+                entry = entry->overflow;
+                f(entry->key, entry->value);
+            }
+        }
+    }
+}
+
 str_hashmap str_hashmap_resize(str_hashmap map, size_t new_capacity)
 {
     if (new_capacity == 0) {

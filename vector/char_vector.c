@@ -195,6 +195,14 @@ char_vector char_vector_resize(char_vector v, size_t new_capacity)
     return v;
 }
 
+void char_vector_for_each(char_vector v, void (*f)(size_t, char))
+{
+    size_t i;
+    for (i = 0; i < v->length; i++) {
+        f(i, v->array[i]);
+    }
+}
+
 char *char_vector_to_string(char_vector v)
 {
     char *str = malloc(v->length + 1);

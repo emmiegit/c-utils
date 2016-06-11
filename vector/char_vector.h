@@ -45,6 +45,7 @@ char char_vector_get(char_vector v, size_t index, bool *success);
 bool char_vector_set(char_vector v, size_t index, char item);
 bool char_vector_remove(char_vector v, size_t index);
 char_vector char_vector_resize(char_vector v, size_t new_capacity);
+void char_vector_for_each(char_vector v, void (*f)(size_t, char));
 char *char_vector_to_string(char_vector v);
 char *char_vector_to_buffer(char_vector v);
 

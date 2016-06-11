@@ -49,6 +49,7 @@ bool int_hashmap_contains_key(int_hashmap map, long key);
 bool int_hashmap_get(int_hashmap map, long key, const void **value);
 const long *int_hashmap_list_keys(int_hashmap map);
 const void **int_hashmap_list_values(int_hashmap map);
+void int_hashmap_for_each(int_hashmap map, void (*f)(long, const void *));
 int_hashmap int_hashmap_resize(int_hashmap map, size_t new_capacity);
 
 #define int_hashmap_is_empty(map)       ((map)->size == 0)

@@ -51,6 +51,7 @@ bool str_hashmap_contains_key(str_hashmap map, const char *key);
 bool str_hashmap_get(str_hashmap map, const char *key, long *value);
 const char **str_hashmap_list_keys(str_hashmap map);
 const long *str_hashmap_list_values(str_hashmap map);
+void str_hashmap_for_each(str_hashmap map, void (*f)(const char *, long));
 str_hashmap str_hashmap_resize(str_hashmap map, size_t new_capacity);
 
 #define str_hashmap_is_empty(map)       ((map)->size == 0)

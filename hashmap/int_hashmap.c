@@ -294,6 +294,23 @@ const void **int_hashmap_list_values(int_hashmap map)
     return array;
 }
 
+void int_hashmap_for_each(int_hashmap map, void (*f)(long, const void *))
+{
+    struct int_hashentry_st *entry;
+    size_t i;
+    for (i = 0; i < map->capacity; i++) {
+        entry = &map->items[i];
+        if (!entry->is_empty) {
+            f(entry->key, entry->value);
+
+            while (entry->overflow && !entry->overflow->is_empty) {
+                entry = entry->overflow;
+                f(entry->key, entry->value);
+            }
+        }
+    }
+}
+
 int_hashmap int_hashmap_resize(int_hashmap map, size_t new_capacity)
 {
     if (new_capacity < 2) {

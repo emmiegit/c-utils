@@ -44,6 +44,7 @@ bool vector_shrink(vector v, size_t decrease);
 void *vector_get(vector v, size_t index, bool *success);
 bool vector_set(vector v, size_t index, void *item);
 bool vector_remove(vector v, size_t index);
+void vector_for_each(vector v, void (*f)(size_t, void *));
 vector vector_resize(vector v, size_t new_capacity);
 
 #define vector_is_empty(v)      ((v)->size == 0)
