@@ -6,7 +6,7 @@ LINK_FLAGS = -shared
 
 SOURCES = $(wildcard *.c)
 OBJECTS = $(patsubst %.c,bin/%.o,$(SOURCES))
-TARGET = aishashmap.so
+TARGET = bin/aishashmap.so
 
 all: bin $(TARGET)
 

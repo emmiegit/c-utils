@@ -6,7 +6,7 @@ LINK_FLAGS = -shared
 
 SOURCES = $(wildcard *.c)
 OBJECTS = $(patsubst %.c,bin/%.o,$(SOURCES))
-TARGET = aisvector.so
+TARGET = bin/aisvector.so
 
 all: bin $(TARGET)
 

@@ -46,5 +46,7 @@ bool vector_set(vector v, size_t index, void *item);
 bool vector_remove(vector v, size_t index);
 vector vector_resize(vector v, size_t new_capacity);
 
+#define vector_is_empty(v)      ((v)->size == 0)
+
 #endif /* __VECTOR_H */
 

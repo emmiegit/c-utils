@@ -53,5 +53,7 @@ const char **str_hashmap_list_keys(str_hashmap map);
 const long *str_hashmap_list_values(str_hashmap map);
 str_hashmap str_hashmap_resize(str_hashmap map, size_t new_capacity);
 
+#define str_hashmap_is_empty(map)       ((map)->size == 0)
+
 #endif /* __STR_HASHMAP_H */
 

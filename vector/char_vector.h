@@ -48,5 +48,7 @@ char_vector char_vector_resize(char_vector v, size_t new_capacity);
 char *char_vector_to_string(char_vector v);
 char *char_vector_to_buffer(char_vector v);
 
+#define char_vector_is_empty(v)         ((v)->size == 0)
+
 #endif /* __CHAR_VECTOR_H */
 

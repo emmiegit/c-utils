@@ -51,5 +51,7 @@ const long *int_hashmap_list_keys(int_hashmap map);
 const void **int_hashmap_list_values(int_hashmap map);
 int_hashmap int_hashmap_resize(int_hashmap map, size_t new_capacity);
 
+#define int_hashmap_is_empty(map)       ((map)->size == 0)
+
 #endif /* __INT_HASHMAP_H */
 
