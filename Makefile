@@ -1,12 +1,16 @@
-.PHONY: all debug force forcedebug clean
+.PHONY: all release debug force forcedebug clean
 
 CC = gcc
 FLAGS = -ansi -Wall -Wextra -pipe -O3
+RELEASE_FLAGS = -fstack-protector-strong
 
 SOURCES = $(wildcard *.c)
 TARGETS = $(patsubst %.c,bin/%,$(SOURCES))
 
 all: bin $(TARGETS)
+
+release: bin
+	@make EXTRA_FLAGS='$(RELEASE_FLAGS)' $(TARGETS)
 
 bin:
 	@echo '[MKDIR] bin'
