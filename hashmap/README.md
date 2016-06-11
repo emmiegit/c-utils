@@ -1,4 +1,4 @@
-## aishashmap.so
+## libaishashmap.so
 
 ### General
 Hash maps are key-value pairs that are managed and kept unique through the usage of a hash function. Both maps are managed using their appropriate functions. So integer hashmaps are created using `int_hashmap_init`
