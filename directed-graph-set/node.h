@@ -1,7 +1,7 @@
 /*
  * node.h
  *
- * libaisdgs (ais directed-graph-set)
+ * directed-graph-set
  * Copyright (c) 2016 Ammon Smith
  *
  * This file is available to you under the Apache License, Version 2.0 (the

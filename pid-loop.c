@@ -1,3 +1,10 @@
+/*
+ * pidloop.c
+ * Idle while the given pid exists.
+ *
+ * Licensed under the Apache 2.0 License.
+ */
+
 #include <errno.h>
 #include <signal.h>
 #include <stdio.h>
