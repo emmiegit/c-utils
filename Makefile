@@ -19,7 +19,7 @@ bin:
 bin/%: %.c
 	@echo '[CC] $(@F)'
 	@$(CC) $(FLAGS) $(EXTRA_FLAGS) $< -o $(@F)
-	@mv $(@F) -t bin
+	@mv $(@F) bin
 
 debug:
 	@make EXTRA_FLAGS='-g -Og'
