@@ -20,9 +20,9 @@ int main(int argc, char *argv[])
     /* Parse arguments */
     for (i = 1; i < argc; i++) {
         if (strcmp(argv[i], "-a") == 0
-            || strcmp(argv[i], "--all")) {
+            || strcmp(argv[i], "--all") == 0) {
             keep_running = true;
-        } else if (strcmp(argv[i], "--help")) {
+        } else if (strcmp(argv[i], "--help") == 0) {
             printf("Usage: %s [-a]\n"
                    " -a, --all      Read all characters until EOF.\n",
                    basename(argv[0]));
