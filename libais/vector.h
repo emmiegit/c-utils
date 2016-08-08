@@ -49,9 +49,9 @@ int vector_get(struct vector *v, size_t index, void **item);
 int vector_set(struct vector *v, size_t index, const void *item);
 int vector_insert(struct vector *v, size_t index, void *item);
 int vector_remove(struct vector *v, size_t index);
+int vector_pop(struct vector *v, void **item);
 int vector_resize(struct vector *v, size_t new_capacity);
 int vector_expand(struct vector *v, size_t new_size);
-int vector_pop(struct vector *v);
 
 /*
  * Runs the callback function cbf on each item in the vector.

@@ -24,7 +24,9 @@
 #include <string.h>
 
 #include "hashmap.h"
+#include "util.h"
 
+#define GET_INDEX(key, map)		(djb2_hash((key)->buffer, (key)->length) % (map)->capacity)
 #define ENTRY_IS_EMPTY(x)		(!(x)->key.buffer)
 #define KEYS_ARE_EQUAL(x, y)		\
 	(((x) == (y)) || (((x)->length == (y)->length) && (!memcmp((x), (y), (x)->length))))
@@ -102,7 +104,7 @@ int hashmap_insert(struct hashmap *const map, struct hashmap_key *const key, con
 	size_t index;
 	struct hashmap_entry *entry;
 
-	index = djb2_hash(key) % map->capacity;
+	index = GET_INDEX(key, map);
 	entry = &map->items[index];
 
 	if (ENTRY_IS_EMPTY(entry)) {
@@ -145,7 +147,7 @@ int hashmap_replace(struct hashmap *const map, struct hashmap_key *const key, co
 	size_t index;
 	struct hashmap_entry *entry;
 
-	index = djb2_hash(key) % map->capacity;
+	index = GET_INDEX(key, map);
 	entry = &map->items[index];
 
 	if (ENTRY_IS_EMPTY(entry)) {
@@ -174,7 +176,7 @@ int hashmap_update(struct hashmap *const map, struct hashmap_key *const key, con
 	size_t index;
 	struct hashmap_entry *entry;
 
-	index = djb2_hash(key) % map->capacity;
+	index = GET_INDEX(key, map);
 	entry = &map->items[index];
 
 	if (ENTRY_IS_EMPTY(entry)) {
@@ -219,7 +221,7 @@ int hashmap_remove(struct hashmap *const map, struct hashmap_key *const key)
 	size_t index;
 	struct hashmap_entry *entry;
 
-	index = djb2_hash(key) % map->capacity;
+	index = GET_INDEX(key, map);
 	entry = &map->items[index];
 
 	if (ENTRY_IS_EMPTY(entry)) {
@@ -263,7 +265,7 @@ int hashmap_contains_key(struct hashmap *const map, struct hashmap_key *const ke
 	size_t index;
 	struct hashmap_entry *entry;
 
-	index = djb2_hash(key) % map->capacity;
+	index = GET_INDEX(key, map);
 	entry = &map->items[index];
 
 	if (ENTRY_IS_EMPTY(entry)) {
@@ -289,7 +291,7 @@ int hashmap_get(struct hashmap *const map, struct hashmap_key *const key, void *
 	size_t index;
 	struct hashmap_entry *entry;
 
-	index = djb2_hash(key) % map->capacity;
+	index = GET_INDEX(key, map);
 	entry = &map->items[index];
 
 	if (ENTRY_IS_EMPTY(entry)) {
@@ -398,18 +400,5 @@ int hashmap_for_each(struct hashmap *const map,
 	}
 
 	return 0;
-}
-
-unsigned long djb2_hash(const struct hashmap_key *const key)
-{
-	size_t i;
-	unsigned long hash = 5381;
-
-	for (i = 0; i < key->length; i++) {
-		/* hash * 33 + ch */
-		hash = ((hash << 5) + hash) + key->buffer[i];
-	}
-
-	return hash;
 }
 

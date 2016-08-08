@@ -86,8 +86,6 @@ void **hashmap_list_values(struct hashmap *map);
 int hashmap_for_each(struct hashmap *map,
 	int (*cbf)(void *arg, struct hashmap_key *key, void *value), void *arg);
 
-unsigned long djb2_hash(const struct hashmap_key *key);
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
