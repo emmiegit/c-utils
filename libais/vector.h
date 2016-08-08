@@ -50,15 +50,16 @@ int vector_set(struct vector *v, size_t index, const void *item);
 int vector_insert(struct vector *v, size_t index, void *item);
 int vector_remove(struct vector *v, size_t index);
 int vector_pop(struct vector *v, void **item);
-int vector_resize(struct vector *v, size_t new_capacity);
-int vector_expand(struct vector *v, size_t new_size);
+int vector_resize(struct vector *v, size_t new_size);
+int vector_expand(struct vector *v, size_t new_capacity);
+int vector_shrink(struct vector *v, size_t new_capacity);
 
 /*
  * Runs the callback function cbf on each item in the vector.
  * If cbf returns nonzero the loop aborts.
  */
 int vector_for_each(struct vector *v,
-				int (*cbf)(void *arg, size_t index, void *item), void *arg);
+		int (*cbf)(void *arg, size_t index, void *item), void *arg);
 
 #define vector_get_size(v)				((v)->size)
 #define vector_is_empty(v)				((v)->size == 0)

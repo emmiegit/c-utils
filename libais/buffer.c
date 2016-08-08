@@ -169,6 +169,7 @@ int buffer_expand(struct buffer *const buf, const size_t new_capacity)
 		return -1;
 	}
 
+	buf->data = new_data;
 	buf->capacity = new_capacity;
 	return 0;
 }

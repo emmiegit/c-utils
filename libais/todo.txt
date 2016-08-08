@@ -1,0 +1,4 @@
+Add array copying to vector.
+Add resize to hashmap and hashset.
+Add red-black tree (treemap and treeset).
+

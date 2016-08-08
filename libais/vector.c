@@ -51,7 +51,7 @@ void vector_clear(struct vector *const v)
 int vector_append(struct vector *const v, void *const item)
 {
 	if (v->size + 1 >= v->capacity) {
-		int ret = vector_resize(v, v->capacity * 2);
+		int ret = vector_expand(v, v->capacity * 2);
 		if (ret) {
 			return -1;
 		}
@@ -67,7 +67,7 @@ int vector_prepend(struct vector *const v, void *const item)
 	size_t i;
 
 	if (v->size + 1 >= v->capacity) {
-		int ret = vector_resize(v, v->capacity * 2);
+		int ret = vector_expand(v, v->capacity * 2);
 		if (ret) {
 			return -1;
 		}
@@ -111,7 +111,7 @@ int vector_insert(struct vector *const v, const size_t index, void *const item)
 	}
 
 	if (v->size + 1 >= v->capacity) {
-		int ret = vector_resize(v, v->capacity * 2);
+		int ret = vector_expand(v, v->capacity * 2);
 		if (ret) {
 			return -1;
 		}
@@ -153,30 +153,13 @@ int vector_pop(struct vector *const v, void **const item)
 	return 0;
 }
 
-int vector_resize(struct vector *const v, const size_t new_capacity)
-{
-	void **new_items;
-
-	if (new_capacity <= v->capacity) {
-		return 1;
-	}
-
-	new_items = malloc(new_capacity * sizeof(void *));
-	if (!new_items) {
-		return -1;
-	}
-
-	memcpy(new_items, v->items, v->size * sizeof(void *));
-	return 0;
-}
-
-int vector_expand(struct vector *const v, const size_t new_size)
+int vector_resize(struct vector *const v, const size_t new_size)
 {
 	size_t i;
 
 	if (new_size >= v->capacity) {
 		int ret;
-		ret = vector_resize(v, new_size);
+		ret = vector_expand(v, new_size);
 		if (ret) {
 			return -1;
 		}
@@ -187,6 +170,42 @@ int vector_expand(struct vector *const v, const size_t new_size)
 	}
 
 	v->size = new_size;
+	return 0;
+}
+
+int vector_expand(struct vector *const v, const size_t new_capacity)
+{
+	const void **new_items;
+
+	if (new_capacity < v->capacity) {
+		return 1;
+	}
+
+	new_items = realloc(v->items, new_capacity * sizeof(void *));
+	if (!new_items) {
+		return -1;
+	}
+
+	v->items = new_items;
+	v->capacity = new_capacity;
+	return 0;
+}
+
+int vector_shrink(struct vector *const v, const size_t new_capacity)
+{
+	const void **new_items;
+
+	if (new_capacity > v->capacity) {
+		return 1;
+	}
+
+	new_items = realloc(v->items, new_capacity * sizeof(void *));
+	if (!new_items) {
+		return -1;
+	}
+
+	v->items = new_items;
+	v->capacity = new_capacity;
 	return 0;
 }
 
