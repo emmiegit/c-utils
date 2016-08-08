@@ -43,7 +43,6 @@ struct buffer {
 int buffer_init(struct buffer *buf, size_t capacity);
 void buffer_destroy(struct buffer *buf);
 
-/* TODO add methods for int16_t, int32_t and int64_t */
 void buffer_clear(struct buffer *buf);
 int buffer_append(struct buffer *buf, char byte);
 int buffer_prepend(struct buffer *buf, char byte);
@@ -52,14 +51,46 @@ int buffer_set(struct buffer *buf, size_t index, char byte);
 int buffer_insert(struct buffer *buf, size_t index, char byte);
 int buffer_remove(struct buffer *buf, size_t index);
 int buffer_pop(struct buffer *buf, char *byte);
-int buffer_resize(struct buffer *buf, size_t new_capacity);
-int buffer_expand(struct buffer *buf, size_t new_size);
+
+/*
+ * resize() changes the size (bigger or smaller)
+ * expand() changes the capacity (only bigger)
+ * shrink() changes the capacity (only smaller)
+ */
+int buffer_resize(struct buffer *buf, size_t new_size);
+int buffer_expand(struct buffer *buf, size_t new_capacity);
+int buffer_shrink(struct buffer *buf, size_t new_capacity);
 
 /*
  * Runs the callback function cbf on each item in the buffer.
  * If cbf returns nonzero the loop aborts.
  */
 int buffer_for_each(struct buffer *buf, int (*cbf)(void *arg, size_t index, char byte), void *arg);
+
+int buffer_append_bytes(struct buffer *buf, const char *bytes, size_t length);
+int buffer_prepend_bytes(struct buffer *buf, const char *bytes, size_t length);
+int buffer_get_bytes(struct buffer *buf, size_t index, char *bytes, size_t length);
+int buffer_set_bytes(struct buffer *buf, size_t index, const char *bytes, size_t length);
+int buffer_insert_bytes(struct buffer *buf, size_t index, const char *bytes, size_t length);
+int buffer_remove_bytes(struct buffer *buf, size_t index, size_t length);
+
+#define buffer_append_int(buf, val)			\
+	(buffer_append_bytes((buf), (void *)(&(val)), sizeof(val)))
+
+#define buffer_prepend_int(buf, val)			\
+	(buffer_prepend_bytes((buf), (void *)(&(val)), sizeof(val)))
+
+#define buffer_get_int(buf, index, val)			\
+	(buffer_get_bytes((buf), (index), (void *)(&(val)), sizeof(val)))
+
+#define buffer_set_int(buf, index, val)			\
+	(buffer_set_bytes((buf), (index), (void *)(&(val)), sizeof(val)))
+
+#define buffer_insert_int(buf, index, val)		\
+	(buffer_insert_bytes((buf), (index), (void *)(&(val)), sizeof(val)))
+
+#define buffer_remove_int(buf, index, val)		\
+	(buffer_remove_bytes((buf), (index), sizeof(val))
 
 #define buffer_get_size(buf)				((buf)->size)
 #define buffer_is_empty(buf)				((buf)->size == 0)
