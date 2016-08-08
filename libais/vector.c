@@ -38,7 +38,7 @@ int vector_init(struct vector *const v, const size_t capacity)
 	return 0;
 }
 
-void vector_destory(struct vector *const v)
+void vector_destroy(struct vector *const v)
 {
 	free(v->items);
 }

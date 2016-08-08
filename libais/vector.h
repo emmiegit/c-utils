@@ -29,9 +29,9 @@ extern "C" {
 #endif /* __cplusplus */
 
 struct vector {
-		const void **items;
-		size_t size;
-		size_t capacity;
+	const void **items;
+	size_t size;
+	size_t capacity;
 };
 
 /*
@@ -40,7 +40,7 @@ struct vector {
  * getting and releasing the memory for it.
  */
 int vector_init(struct vector *v, size_t capacity);
-void vector_destory(struct vector *v);
+void vector_destroy(struct vector *v);
 
 void vector_clear(struct vector *v);
 int vector_append(struct vector *v, void *item);
