@@ -1,5 +1,5 @@
 /*
- * util.h
+ * string.c
  *
  * libais - Ammon's C library
  * Copyright (c) 2016 Ammon Smith
@@ -19,20 +19,47 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __UTIL_H
-#define __UTIL_H
+#include <stdlib.h>
+#include <string.h>
 
-#include <stddef.h>
+#include "ais/string.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+int string_init(struct string *str, size_t capacity)
+{
+	str->buffer = malloc(capacity);
+	str->length = capacity;
+	if (!str->buffer) {
+		return -1;
+	}
 
-unsigned long djb2_hash(const char *buffer, size_t length);
-
-#ifdef __cplusplus
+	return 0;
 }
-#endif /* __cplusplus */
 
-#endif /* __UTIL_H */
+void string_destroy(struct string *str)
+{
+	free(str->buffer);
+}
+
+int string_resize(struct string *str, size_t length)
+{
+	char *new_buf = realloc(str->buffer, length);
+	if (!new_buf) {
+		return -1;
+	}
+
+	if (length > str->length) {
+		memset(new_buf + str->length, 0, length - str->length);
+	}
+
+	str->buffer = new_buf;
+	str->length = length;
+	return 0;
+}
+
+int string_set(struct string *str, const char *cptr)
+{
+	size_t len = strlen(cptr);
+	memcpy(str->buffer, cptr, len);
+	return 0;
+}
 

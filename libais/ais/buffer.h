@@ -19,8 +19,8 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __BUFFER_H
-#define __BUFFER_H
+#ifndef __AIS_BUFFER_H
+#define __AIS_BUFFER_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -99,5 +99,5 @@ int buffer_remove_bytes(struct buffer *buf, size_t index, size_t length);
 }
 #endif /* __cplusplus */
 
-#endif /* __BUFFER_H */
+#endif /* __AIS_BUFFER_H */
 

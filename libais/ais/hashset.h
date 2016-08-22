@@ -19,8 +19,8 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __HASHSET_H
-#define __HASHSET_H
+#ifndef __AIS_HASHSET_H
+#define __AIS_HASHSET_H
 
 #include <stddef.h>
 
@@ -85,5 +85,5 @@ int hashset_for_each(struct hashset *set,
 }
 #endif /* __cplusplus */
 
-#endif /* __HASHSET_H */
+#endif /* __AIS_HASHSET_H */
 

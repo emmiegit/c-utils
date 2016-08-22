@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "buffer.h"
+#include "ais/buffer.h"
 
 #define MAX(x, y)			(((x) > (y)) ? (x) : (y))
 #define MIN(x, y)			(((x) < (y)) ? (x) : (y))

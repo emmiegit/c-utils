@@ -1,5 +1,5 @@
 /*
- * util.c
+ * string.h
  *
  * libais - Ammon's C library
  * Copyright (c) 2016 Ammon Smith
@@ -19,18 +19,21 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ais/util.h"
+#ifndef __AIS_STRING_H
+#define __AIS_STRING_H
 
-unsigned long djb2_hash(const char *buffer, size_t length)
-{
-	size_t i;
-	unsigned long hash = 5381;
+#include <stddef.h>
 
-	for (i = 0; i < length; i++) {
-		/* hash * 33 + ch */
-		hash = ((hash << 5) + hash) + buffer[i];
-	}
+struct string {
+	char *buffer;
+	size_t length;
+};
 
-	return hash;
-}
+int string_init(struct string *str, size_t capacity);
+void string_destroy(struct string *str);
+int string_expand(struct string *str, size_t length);
+int string_duplicate(struct string *dest_str, const struct string *src_str);
+int string_set(struct string *str, const char *cptr);
+
+#endif /* __AIS_STRING_H */
 

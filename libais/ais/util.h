@@ -1,5 +1,5 @@
 /*
- * util.c
+ * util.h
  *
  * libais - Ammon's C library
  * Copyright (c) 2016 Ammon Smith
@@ -19,18 +19,20 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ais/util.h"
+#ifndef __AIS_UTIL_H
+#define __AIS_UTIL_H
 
-unsigned long djb2_hash(const char *buffer, size_t length)
-{
-	size_t i;
-	unsigned long hash = 5381;
+#include <stddef.h>
 
-	for (i = 0; i < length; i++) {
-		/* hash * 33 + ch */
-		hash = ((hash << 5) + hash) + buffer[i];
-	}
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
 
-	return hash;
+unsigned long djb2_hash(const char *buffer, size_t length);
+
+#ifdef __cplusplus
 }
+#endif /* __cplusplus */
+
+#endif /* __AIS_UTIL_H */
 

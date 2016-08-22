@@ -19,8 +19,8 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __HASHMAP_H
-#define __HASHMAP_H
+#ifndef __AIS_HASHMAP_H
+#define __AIS_HASHMAP_H
 
 #include <stddef.h>
 
@@ -90,5 +90,5 @@ int hashmap_for_each(struct hashmap *map,
 }
 #endif /* __cplusplus */
 
-#endif /* __HASHMAP_H */
+#endif /* __AIS_HASHMAP_H */
 

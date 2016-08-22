@@ -19,8 +19,8 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __VECTOR_H
-#define __VECTOR_H
+#ifndef __AIS_VECTOR_H
+#define __AIS_VECTOR_H
 
 #include <stddef.h>
 
@@ -68,5 +68,5 @@ int vector_for_each(struct vector *v,
 }
 #endif /* __cplusplus */
 
-#endif /* __VECTOR_H */
+#endif /* __AIS_VECTOR_H */
 

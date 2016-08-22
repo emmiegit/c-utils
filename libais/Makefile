@@ -19,7 +19,7 @@
 # If not, see <http://www.gnu.org/licenses/>.
 #
 
-.PHONY: all clean debug
+.PHONY: all debug install clean
 
 SOURCES := $(wildcard *.c)
 OBJECTS := $(SOURCES:.c=.o)
@@ -42,6 +42,13 @@ $(LIBRARY): $(OBJECTS)
 
 %.d: %.c
 	$(CC) $(FLAGS) -MM $< > $@
+
+install:
+	mkdir -p '$(ROOT)/usr/lib' '$(ROOT)/usr/include/ais'
+	install -m644 $(LIBRARY) '$(ROOT)/usr/lib/$(LIBRARY)'
+	for include in include/*.h; do \
+		install -m644 "$${include}" "$(ROOT)/usr/include/ais/$${include}"; \
+	done
 
 clean:
 	rm -f $(LIBRARY) $(OBJECTS) $(DEPENDS)

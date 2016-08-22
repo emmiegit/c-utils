@@ -23,8 +23,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "hashset.h"
-#include "util.h"
+#include "ais/hashset.h"
+#include "ais/util.h"
 
 #define GET_INDEX(item, set)		(djb2_hash((item)->buffer, (item)->length) % (set)->capacity)
 #define ENTRY_IS_EMPTY(x)		(!(x)->item.buffer)

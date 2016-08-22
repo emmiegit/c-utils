@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "vector.h"
+#include "ais/vector.h"
 
 int vector_init(struct vector *const v, const size_t capacity)
 {
