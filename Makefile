@@ -16,10 +16,13 @@ bin:
 	@echo '[MKDIR] bin'
 	@mkdir -p bin
 
+bin/cgetch: cgetch.c
+	@echo '[CC] $(@F)'
+	@$(CC) $(FLAGS) $(EXTRA_FLAGS) -lncurses $< -o bin/$(@F)
+
 bin/%: %.c
 	@echo '[CC] $(@F)'
-	@$(CC) $(FLAGS) $(EXTRA_FLAGS) $< -o $(@F)
-	@mv $(@F) bin
+	@$(CC) $(FLAGS) $(EXTRA_FLAGS) $< -o bin/$(@F)
 
 debug:
 	@make EXTRA_FLAGS='-g -Og'
