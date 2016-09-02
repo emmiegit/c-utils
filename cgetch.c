@@ -18,7 +18,7 @@ int main()
 	for (counter = 0;; counter++) {
 		int ch;
 
-		if (counter >= 15) {
+		if (counter >= 25) {
 			erase();
 			move(0, 0);
 			refresh();

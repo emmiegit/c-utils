@@ -1,0 +1,62 @@
+.TH RMLN 1 2016-01-29 "moreutils" "moreutils"
+.\" %%%LICENSE_START(GPLv2+_DOC_FULL)
+.\" This is free documentation; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License as
+.\" published by the Free Software Foundation; either version 2 of
+.\" the License, or (at your option) any later version.
+.\"
+.\" The GNU General Public License's references to "object code"
+.\" and "executables" are to be interpreted as the output of any
+.\" document formatting or typesetting system, including
+.\" intermediate and printed output.
+.\"
+.\" This manual is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public
+.\" License along with this manual; if not, see
+.\" <http://www.gnu.org/licenses/>.
+.\" %%%LICENSE_END
+.SH NAME
+rmln \- Remove only symbolic links and hard links.
+.SH SYNOPSIS
+.P
+rmln [\fIOPTION\fP]... [\fIFILE\fP]...
+.P
+rmln [\fB\-\-help\fP | \fB\-\-version\fP]
+.SH DESCRIPTION
+\fBrmln\fP is like \fBrm\fP, except that it only acts on links. This ensures that no actual files or directories are ever deleted.
+.P
+Mandatory arguments to long options are mandatory for short options too.
+.TP
+\fB\-s\fP, \fB\-\-symbolic-only\fP
+Only delete symbolic links.
+.TP
+\fB\-l\fP, \fB\-\-hard-only\fP
+Only delete files with more than one hard link. Note that this can delete symbolic links if they are linked in multiple places.
+.TP
+\fB\-i\fP, \fB\-\-interactive\fP
+Prompt before every removal.
+.TP
+\fB\-r\fP, \fB\-\-recursive\fP
+Recurse into subdirectories and delete any links inside based on the passed options. This program will never delete the directories themselves.
+.TP
+\fB\-v\fP, \fB\-\-verbose\fP
+Print the name of every file as they are removed.
+.TP
+.TP
+\fB\-h\fP, \fB\-\-help\fP
+List all options and what they do.
+.TP
+\fB\-V\fP, \fB\-\-version\fP
+Print the version and a summary of the software license.
+.SH RETURN CODES
+\fBrmln\fP returns 0 on success, and nonzero when errors occur.
+.SH SEE ALSO
+.TP
+\fBrm\fP(1), \fBln\fP(1)
+.SH AUTHOR
+.TP
+Ammon Smith (ammon.i.smith@gmail.com)
