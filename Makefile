@@ -18,7 +18,11 @@ bin:
 
 bin/cgetch: cgetch.c
 	@echo '[CC] $(@F)'
-	@$(CC) $(FLAGS) $(EXTRA_FLAGS) -lncurses $< -o bin/$(@F)
+	@$(CC) $(FLAGS) $(EXTRA_FLAGS) -lncurses -o bin/$(@F) $<
+
+bin/i3_lock: i3_lock.c
+	@echo '[CC] $(@F)'
+	@$(CC) $(FLAGS) $(EXTRA_FLAGS) -lX11 -lXrandr -o bin/$(@F) $<
 
 bin/%: %.c
 	@echo '[CC] $(@F)'
