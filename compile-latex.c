@@ -8,14 +8,16 @@
 #include <time.h>
 
 #include <sys/inotify.h>
+#include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
 #define USE_VFORK
-#define COMPILE_COMMAND	"pdflatex"
+#define DEFAULT_DIRECTORY	"."
+#define COMPILE_COMMAND		"pdflatex"
 
-static void call_command(const char *filename)
+static void call_command(char *filename)
 {
 	pid_t pid;
 
@@ -31,40 +33,62 @@ static void call_command(const char *filename)
 
 	if (pid == 0) {
 		/* We are the child */
-		execlp(COMPILE_COMMAND, filename, NULL);
+		execlp(COMPILE_COMMAND, COMPILE_COMMAND, filename, (char *)NULL);
 		perror("Unable to exec to run compilation command");
 		_exit(EXIT_FAILURE);
 	} else {
+		/* We are the parent */
 		waitpid(pid, NULL, 0);
 	}
 }
 
-static void read_event(const struct inotify_event *event, const char *argv[])
+static void read_event(const struct inotify_event *event)
 {
-	const char *filename = argv[event->wd];
 	time_t now = time(NULL);
 
 	if (event->mask == IN_IGNORED) {
 		return;
 	}
 
+	/* vim leaves a file called "4913" for some reason when writing */
+	if (!strcmp(event->name, "4913")) {
+		return;
+	}
+
 	printf(">> %s", ctime(&now));
 
-	if (event->mask == IN_MODIFY) {
-		call_command(filename);
+	if (event->mask == IN_CREATE) {
+		call_command((char *)event->name);
 	} else {
-		printf("\"%s\" was deleted.\n", filename);
+		puts("Directory was deleted or moved.");
 		exit(EXIT_SUCCESS);
 	}
 }
 
+static int is_directory(const char *path)
+{
+	struct stat buf;
+	if (stat(path, &buf)) {
+		fprintf(stderr, "Unable to stat \"%s\": %s.\n",
+			path, strerror(errno));
+		exit(EXIT_FAILURE);
+	}
+
+	return S_ISDIR(buf.st_mode);
+}
+
 int main(int argc, const char *argv[])
 {
+	const char *directory = DEFAULT_DIRECTORY;
 	int inotify_fd;
-	int i;
+	int wd;
 
-	if (argc < 2) {
-		fprintf(stderr, "Usage: %s filename...\n", argv[0]);
+	if (argc > 1) {
+		directory = argv[1];
+	}
+
+	if (!is_directory(directory)) {
+		fprintf(stderr, "\"%s\" is not a directory.\n", directory);
 		return EXIT_FAILURE;
 	}
 
@@ -74,19 +98,14 @@ int main(int argc, const char *argv[])
 		return EXIT_FAILURE;
 	}
 
-	for (i = 1; i < argc; i++) {
-		int wd = inotify_add_watch(inotify_fd, argv[i],
-				IN_MODIFY | IN_DELETE | IN_DELETE_SELF
-				| IN_MOVE_SELF | IN_MOVED_FROM);
-		if (wd < 0) {
-			fprintf(stderr, "Unable to add watch for \"%s\": %s.\n",
-				argv[i], strerror(errno));
-			return EXIT_FAILURE;
-		}
+	wd = inotify_add_watch(inotify_fd, directory, IN_CREATE | IN_DELETE_SELF | IN_MOVE_SELF);
+	if (wd < 0) {
+		fprintf(stderr, "Unable to add watch for \"%s\": %s.\n", directory, strerror(errno));
+		return EXIT_FAILURE;
 	}
 
 	while (1) {
-		char buf[sizeof(struct inotify_event)];
+		char buf[sizeof(struct inotify_event) + NAME_MAX + 1];
 		ssize_t len;
 
 		len = read(inotify_fd, buf, sizeof(buf));
@@ -100,7 +119,7 @@ int main(int argc, const char *argv[])
 			return EXIT_FAILURE;
 		}
 
-		read_event((struct inotify_event *)buf, argv);
+		read_event((struct inotify_event *)buf);
 	}
 
 	return EXIT_SUCCESS;
