@@ -110,6 +110,7 @@ int hashmap_insert(struct hashmap *const map, struct hashmap_key *const key, con
 	if (ENTRY_IS_EMPTY(entry)) {
 		map->size++;
 		entry->key = *key;
+		entry->value = value;
 		return 0;
 	} else if (KEYS_ARE_EQUAL(key, &entry->key)) {
 		return 1;
@@ -182,6 +183,7 @@ int hashmap_update(struct hashmap *const map, struct hashmap_key *const key, con
 	if (ENTRY_IS_EMPTY(entry)) {
 		map->size++;
 		entry->key = *key;
+		entry->value = value;
 		return 0;
 	} else if (KEYS_ARE_EQUAL(key, &entry->key)) {
 		entry->value = value;
