@@ -8,7 +8,6 @@
 #include <time.h>
 
 #include <sys/inotify.h>
-#include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -65,30 +64,20 @@ static void read_event(const struct inotify_event *event)
 	}
 }
 
-static int is_directory(const char *path)
-{
-	struct stat buf;
-	if (stat(path, &buf)) {
-		fprintf(stderr, "Unable to stat \"%s\": %s.\n",
-			path, strerror(errno));
-		exit(EXIT_FAILURE);
-	}
-
-	return S_ISDIR(buf.st_mode);
-}
-
 int main(int argc, const char *argv[])
 {
 	const char *directory = DEFAULT_DIRECTORY;
 	int inotify_fd;
-	int wd;
+	int wd, ret;
 
 	if (argc > 1) {
 		directory = argv[1];
 	}
 
-	if (!is_directory(directory)) {
-		fprintf(stderr, "\"%s\" is not a directory.\n", directory);
+	ret = chdir(directory);
+	if (ret) {
+		fprintf(stderr, "Unable to change directory to \"%s\": %s.\n",
+			directory, strerror(errno));
 		return EXIT_FAILURE;
 	}
 
