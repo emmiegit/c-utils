@@ -25,30 +25,27 @@
 #include "arguments.h"
 #include "info.h"
 
+/* Global variables */
+struct options opt;
+
 /* Static function declarations */
-static void set_defaults(struct options *opt);
-static void parse_short_arguments(struct options *opt, const char *flags);
+static void parse_short_arguments(const char *const flags);
 static void print_usage(FILE *stream, const char *program_name);
 static void help_and_exit(const char *program_name);
 static void version_and_exit();
 
 /* Function implementations */
-static void set_defaults(struct options *opt)
-{
-	opt->mode = DELETE_ALL_LINKS;
-	opt->interactive = false;
-	opt->recursive = false;
-	opt->verbose = false;
-}
-
-int parse_arguments(struct options *opt, int argc, const char *argv[])
+int parse_arguments(int argc, const char *argv[])
 {
 	int i;
 
-	set_defaults(opt);
+	opt.mode = DELETE_ALL_LINKS;
+	opt.interactive = false;
+	opt.recursive = false;
+	opt.verbose = false;
 
 	if (argc == 1) {
-		print_usage(stderr, opt->program_name);
+		print_usage(stderr, opt.program_name);
 		exit(EXIT_FAILURE);
 	}
 
@@ -57,42 +54,42 @@ int parse_arguments(struct options *opt, int argc, const char *argv[])
 			i++;
 			break;
 		} else if (!strcmp(argv[i], "-s") || !strcmp(argv[i], "--symbolic-only")) {
-			if (opt->mode == DELETE_HARD_LINKS) {
+			if (opt.mode == DELETE_HARD_LINKS) {
 				fprintf(stderr, "%s: conflicting options: '-s' and '-l'\n",
-					opt->program_name);
-				print_usage(stderr, opt->program_name);
+					opt.program_name);
+				print_usage(stderr, opt.program_name);
 				exit(EXIT_FAILURE);
 			}
 
-			opt->mode = DELETE_SYMBOLIC_LINKS;
+			opt.mode = DELETE_SYMBOLIC_LINKS;
 		} else if (!strcmp(argv[i], "-l") || !strcmp(argv[i], "--hard-only")) {
-			if (opt->mode == DELETE_SYMBOLIC_LINKS) {
+			if (opt.mode == DELETE_SYMBOLIC_LINKS) {
 				fprintf(stderr, "%s: conflicting options: '-s' and '-l'\n",
-					opt->program_name);
-				print_usage(stderr, opt->program_name);
+					opt.program_name);
+				print_usage(stderr, opt.program_name);
 				exit(EXIT_FAILURE);
 			}
 
-			opt->mode = DELETE_HARD_LINKS;
+			opt.mode = DELETE_HARD_LINKS;
 		} else if (!strcmp(argv[i], "-i") || !strcmp(argv[i], "--interactive")) {
-			opt->interactive = true;
+			opt.interactive = true;
 		} else if (!strcmp(argv[i], "-r") || !strcmp(argv[i], "--recursive")) {
-			opt->recursive = true;
+			opt.recursive = true;
 		} else if (!strcmp(argv[i], "-v") || !strcmp(argv[i], "--verbose")) {
-			opt->verbose = true;
+			opt.verbose = true;
 		} else if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
-			help_and_exit(opt->program_name);
+			help_and_exit(opt.program_name);
 		} else if (!strcmp(argv[i], "-V") || !strcmp(argv[i], "--version")) {
 			version_and_exit();
 		} else if (argv[i][0] == '-') {
 			if (argv[i][1] == '-') {
 				fprintf(stderr, "%s: invalid flag: %s\n",
-					opt->program_name, argv[i]);
-				print_usage(stderr, opt->program_name);
+					opt.program_name, argv[i]);
+				print_usage(stderr, opt.program_name);
 				exit(EXIT_FAILURE);
 			}
 
-			parse_short_arguments(opt, argv[i] + 1);
+			parse_short_arguments(argv[i] + 1);
 		} else {
 			/* It's a file, not an option */
 			break;
@@ -101,58 +98,58 @@ int parse_arguments(struct options *opt, int argc, const char *argv[])
 
 	/* Check if any files were passed */
 	if (i == argc) {
-		fprintf(stderr, "%s: missing operand\n", opt->program_name);
-		print_usage(stderr, opt->program_name);
+		fprintf(stderr, "%s: missing operand\n", opt.program_name);
+		print_usage(stderr, opt.program_name);
 		exit(EXIT_FAILURE);
 	}
 
 	return i;
 }
 
-static void parse_short_arguments(struct options *const opt, const char *const flags)
+static void parse_short_arguments(const char *const flags)
 {
 	int i;
 	for (i = 0; flags[i]; i++) {
 		switch (flags[i]) {
 		case 's':
-			if (opt->mode == DELETE_HARD_LINKS) {
+			if (opt.mode == DELETE_HARD_LINKS) {
 				fprintf(stderr, "%s: conflicting options: '-s' and '-l'\n",
-					opt->program_name);
-				print_usage(stderr, opt->program_name);
+					opt.program_name);
+				print_usage(stderr, opt.program_name);
 				exit(EXIT_FAILURE);
 			}
 
-			opt->mode = DELETE_SYMBOLIC_LINKS;
+			opt.mode = DELETE_SYMBOLIC_LINKS;
 			break;
 		case 'l':
-			if (opt->mode == DELETE_SYMBOLIC_LINKS) {
+			if (opt.mode == DELETE_SYMBOLIC_LINKS) {
 				fprintf(stderr, "%s: conflicting options: 's' and '-l'\n",
-					opt->program_name);
-				print_usage(stderr, opt->program_name);
+					opt.program_name);
+				print_usage(stderr, opt.program_name);
 				exit(EXIT_FAILURE);
 			}
 
-			opt->mode = DELETE_HARD_LINKS;
+			opt.mode = DELETE_HARD_LINKS;
 			break;
 		case 'i':
-			opt->interactive = true;
+			opt.interactive = true;
 			break;
 		case 'r':
-			opt->recursive = true;
+			opt.recursive = true;
 			break;
 		case 'v':
-			opt->verbose = true;
+			opt.verbose = true;
 			break;
 		case 'h':
-			help_and_exit(opt->program_name);
+			help_and_exit(opt.program_name);
 			break;
 		case 'V':
 			version_and_exit();
 			break;
 		default:
 			fprintf(stderr, "%s: invalid flag: '-%c'\n",
-				opt->program_name, flags[i]);
-			print_usage(stderr, opt->program_name);
+				opt.program_name, flags[i]);
+			print_usage(stderr, opt.program_name);
 		}
 	}
 }

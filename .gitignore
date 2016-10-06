@@ -1,11 +1,19 @@
+# Artifacts
 **/bin
 *.o
 *.d
 *.a
 *.so
 
+# Debugging
+core
+core.*
+vgcore*
+
+# Configuration
 .ycm_extra_conf.py*
 
+# Misc
 *.*.swp
 *~
 

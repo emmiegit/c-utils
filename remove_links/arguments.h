@@ -21,9 +21,19 @@
 #ifndef __ARGUMENTS_H
 #define __ARGUMENTS_H
 
+#undef EXTERN
+#ifndef __ARGUMENTS_EXTERN
+# define __ARGUMENTS_EXTERN
+# define EXTERN extern
+#else
+# define EXTERN
+#endif /* __ARGUMENTS_EXTERN */
+
 #include "options.h"
 
-int parse_arguments(struct options *opt, int argc, const char *argv[]);
+EXTERN struct options opt;
+
+int parse_arguments(int argc, const char *argv[]);
 
 #endif /* __ARGUMENTS_H */
 

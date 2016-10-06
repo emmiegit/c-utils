@@ -23,8 +23,8 @@
 
 #include "options.h"
 
-int remove_link(const char *path, const struct options *opt);
-int remove_recursive(const char *const path, const struct options *opt);
+int remove_link(const char *path);
+int remove_recursive(const char *const path);
 
 #endif /* __REMOVE_H */
 

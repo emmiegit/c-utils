@@ -33,10 +33,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "arguments.h"
 #include "remove.h"
-
-/* Static members */
-static const struct options *opt;
 
 /* Static function declarations */
 static int unlink_path(const char *path, mode_t mode, unsigned int links);
@@ -45,23 +43,23 @@ static bool prompt(const char *path, mode_t mode, unsigned int links);
 static void print_is_a_directory(const char *path);
 static void print_not_a_link(const char *path);
 
-int remove_link(const char *const path, const struct options *options)
+int remove_link(const char *const path)
 {
 	struct stat statbuf;
 	if (lstat(path, &statbuf)) {
+		if (!opt.program_name) puts("prog null");
+		if (!path) puts("path null");
 		fprintf(stderr, "%s: unable to stat '%s': %s\n",
-			opt->program_name, path, strerror(errno));
+			opt.program_name, path, strerror(errno));
 		return 1;
 	}
-
-	opt = options;
 
 	if (S_ISDIR(statbuf.st_mode)) {
 		print_is_a_directory(path);
 		return 1;
-	} else if (statbuf.st_nlink > 1 && IF_DELETE_HARD_LINKS(opt->mode)) {
+	} else if (statbuf.st_nlink > 1 && IF_DELETE_HARD_LINKS(opt.mode)) {
 		return unlink_path(path, statbuf.st_mode, statbuf.st_nlink);
-	} else if (S_ISLNK(statbuf.st_mode) && IF_DELETE_SYMLINKS(opt->mode)) {
+	} else if (S_ISLNK(statbuf.st_mode) && IF_DELETE_SYMLINKS(opt.mode)) {
 		return unlink_path(path, statbuf.st_mode, 0);
 	}
 
@@ -69,22 +67,20 @@ int remove_link(const char *const path, const struct options *options)
 	return 1;
 }
 
-int remove_recursive(const char *const path, const struct options *options)
+int remove_recursive(const char *const path)
 {
 	struct stat statbuf;
 	if (lstat(path, &statbuf)) {
 		fprintf(stderr, "%s: unable to stat '%s': %s\n",
-			opt->program_name, path, strerror(errno));
+			opt.program_name, path, strerror(errno));
 		return 1;
 	}
 
-	opt = options;
-
 	if (S_ISDIR(statbuf.st_mode)) {
 		return unlink_directory(path);
-	} else if (statbuf.st_nlink > 1 && IF_DELETE_HARD_LINKS(opt->mode)) {
+	} else if (statbuf.st_nlink > 1 && IF_DELETE_HARD_LINKS(opt.mode)) {
 		return unlink_path(path, statbuf.st_mode, statbuf.st_nlink);
-	} else if (S_ISLNK(statbuf.st_mode) && IF_DELETE_SYMLINKS(opt->mode)) {
+	} else if (S_ISLNK(statbuf.st_mode) && IF_DELETE_SYMLINKS(opt.mode)) {
 		return unlink_path(path, statbuf.st_mode, 0);
 	}
 
@@ -101,12 +97,12 @@ static int unlink_directory(const char *const path)
 	dir = opendir(path);
 	if (!dir) {
 		fprintf(stderr, "%s: cannot open '%s': %s\n",
-			opt->program_name, path, strerror(errno));
+			opt.program_name, path, strerror(errno));
 
 		return 1;
 	}
 
-	if (opt->interactive) {
+	if (opt.interactive) {
 		if (!prompt(path, S_IFDIR, 0)) {
 			return 0;
 		}
@@ -122,7 +118,7 @@ static int unlink_directory(const char *const path)
 		fullpath = malloc(strlen(path) + strlen(entry->d_name) + 2);
 		if (!fullpath) {
 			fprintf(stderr, "%s: cannot allocate pathname buffer: %s\n",
-				opt->program_name, strerror(errno));
+				opt.program_name, strerror(errno));
 			return 1;
 		}
 
@@ -130,10 +126,10 @@ static int unlink_directory(const char *const path)
 
 		if (entry->d_type == DT_DIR) {
 			status += unlink_directory(fullpath);
-		} else if (entry->d_type == DT_LNK && IF_DELETE_SYMLINKS(opt->mode)) {
+		} else if (entry->d_type == DT_LNK && IF_DELETE_SYMLINKS(opt.mode)) {
 			status += unlink_path(fullpath, S_IFLNK, 0);
 		} else {
-			status += remove_recursive(fullpath, opt);
+			status += remove_recursive(fullpath);
 		}
 
 		free(fullpath);
@@ -142,7 +138,7 @@ static int unlink_directory(const char *const path)
 	ret = closedir(dir);
 	if (ret) {
 		fprintf(stderr, "%s: cannot close '%s': %s\n",
-			opt->program_name, path, strerror(errno));
+			opt.program_name, path, strerror(errno));
 		return 1;
 	}
 
@@ -153,7 +149,7 @@ static int unlink_path(const char *const path, const mode_t mode, const unsigned
 {
 	int ret;
 
-	if (opt->interactive) {
+	if (opt.interactive) {
 		if (!prompt(path, mode, links)) {
 			return 1;
 		}
@@ -163,12 +159,12 @@ static int unlink_path(const char *const path, const mode_t mode, const unsigned
 
 	if (ret) {
 		fprintf(stderr, "%s: cannot remove '%s': %s\n",
-			opt->program_name, path, strerror(errno));
+			opt.program_name, path, strerror(errno));
 
 		return 1;
 	}
 
-	if (opt->verbose) {
+	if (opt.verbose) {
 		printf("removed '%s'.\n", path);
 	}
 
@@ -203,7 +199,7 @@ static bool prompt(const char *const path, const mode_t mode, const unsigned int
 			strftype = "block device";
 		} else {
 			fprintf(stderr, "%s: internal error, invalid mode: %u\n",
-				opt->program_name, mode);
+				opt.program_name, mode);
 			abort();
 		}
 
@@ -217,20 +213,20 @@ static bool prompt(const char *const path, const mode_t mode, const unsigned int
 static void print_is_a_directory(const char *const path)
 {
 	fprintf(stderr, "%s: won't remove '%s': is a directory\n",
-		opt->program_name, path);
+		opt.program_name, path);
 }
 
 static void print_not_a_link(const char *const path)
 {
-	switch (opt->mode) {
+	switch (opt.mode) {
 	case DELETE_ALL_LINKS:
-		fprintf(stderr, "%s: won't remove '%s': not a link\n", opt->program_name, path);
+		fprintf(stderr, "%s: won't remove '%s': not a link\n", opt.program_name, path);
 		break;
 	case DELETE_SYMBOLIC_LINKS:
-		fprintf(stderr, "%s: won't remove '%s': not a symbolic link\n", opt->program_name, path);
+		fprintf(stderr, "%s: won't remove '%s': not a symbolic link\n", opt.program_name, path);
 		break;
 	case DELETE_HARD_LINKS:
-		fprintf(stderr, "%s: won't remove '%s': not a hard link\n", opt->program_name, path);
+		fprintf(stderr, "%s: won't remove '%s': not a hard link\n", opt.program_name, path);
 	}
 }
 
