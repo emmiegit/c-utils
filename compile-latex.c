@@ -32,6 +32,7 @@ static void call_command(char *filename)
 
 	if (pid == 0) {
 		/* We are the child */
+		close(STDIN_FILENO);
 		execlp(COMPILE_COMMAND, COMPILE_COMMAND, filename, (char *)NULL);
 		perror("Unable to exec to run compilation command");
 		_exit(EXIT_FAILURE);
@@ -49,7 +50,7 @@ static void read_event(const struct inotify_event *event)
 		return;
 	}
 
-	/* vim leaves a file called "4913" for some reason when writing */
+	/* vim creates a file called "4913" for some reason when writing */
 	if (!strcmp(event->name, "4913")) {
 		return;
 	}
