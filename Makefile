@@ -24,6 +24,10 @@ bin/i3_lock: i3_lock.c
 	@echo '[CC] $(@F)'
 	@$(CC) $(FLAGS) $(EXTRA_FLAGS) -lX11 -lXrandr -o bin/$(@F) $<
 
+bin/xfiller: xfiller.c
+	@echo '[CC] $(@F)'
+	@$(CC) $(FLAGS) $(EXTRA_FLAGS) -lX11 -o bin/$(@F) $<
+
 bin/%: %.c
 	@echo '[CC] $(@F)'
 	@$(CC) $(FLAGS) $(EXTRA_FLAGS) $< -o bin/$(@F)
