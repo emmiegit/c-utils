@@ -22,15 +22,14 @@
  * SOFTWARE.
  */
 
+#include <ctype.h>
 #include <string.h>
 
 #include "roman.h"
 
-#define NUM_DIGITS	7
-
-static const struct {
+static const struct digit_value {
 	char ch;
-	unsigned short value;
+	short value;
 } digits[] = {
 	{ 'I', 1 },
 	{ 'V', 5 },
@@ -38,34 +37,100 @@ static const struct {
 	{ 'L', 50 },
 	{ 'C', 100 },
 	{ 'D', 500 },
-	{ 'M', 1000 }
+	{ 'M', 1000 },
+	{ '\0', -1 }
 };
+
+static short get_digit(char ch)
+{
+	const struct digit_value *dv;
+
+	ch = toupper(ch);
+	dv = &digits[0];
+	while (dv->ch) {
+		if (dv->ch == ch) {
+			return dv->value;
+		}
+		dv++;
+	}
+	return -1;
+}
 
 long roman2long(const char *str)
 {
 	return nroman2long(str, strlen(str));
 }
 
-long nroman2long(const char *buf, size_t len)
+long nroman2long(const char *str, size_t len)
 {
-	long num;
+	int neg;
+	long sum, partial;
+	short last, cur;
+	size_t i;
 
+	/* Ignore leading whitespace */
+	for (i = 0; isspace(str[i]); i++) {
+		if (i == len) {
+			return 0;
+		}
+	}
 
-	if (len == 0) {
+	/* Set initial values and flags */
+	sum = 0;
+	if (str[0] == '-') {
+		neg = 1;
+		i++;
+	} else {
+		neg = 0;
+	}
+	last = get_digit(str[i++]);
+	partial = last;
+	if (last < 0) {
 		return -1;
 	}
 
-	num = 0;
+	/* Read each character */
+	for (; i < len; i++) {
+		if (isspace(str[i])) {
+			break;
+		}
+
+		cur = get_digit(str[i]);
+		if (cur < 0) {
+			return -1;
+		}
+		partial += cur;
+		if (cur > last) {
+			sum = cur - partial;
+			partial = 0;
+		} else if (cur < last) {
+			last = cur;
+		}
+	}
+	sum += partial;
+
+	/* Ignore trailing whitespace */
+	for (; i < len; i++) {
+		if (!isspace(str[i])) {
+			return -1;
+		}
+	}
+
+	return (!neg) ? sum : -sum;
 }
 
 char *long2roman(long num)
 {
+	(void)num;
 	/* TODO */
 	return NULL;
 }
 
 int long2nroman(long num, char *buf, size_t len)
 {
+	(void)num;
+	(void)buf;
+	(void)len;
 	/* TODO */
 	return -1;
 }

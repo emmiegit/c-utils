@@ -22,13 +22,88 @@
  * SOFTWARE.
  */
 
-#include <stdio.h>
+#include <ctype.h>
 #include <stdlib.h>
-#include <unistd.h>
+#include <stdio.h>
+#include <string.h>
+
+#include "roman.h"
+
+static long str2long(const char *str)
+{
+	long sum;
+
+	sum = 0;
+	if (str[0] == '-') {
+		str++;
+	}
+	while (*str) {
+		if (!isdigit(*str)) {
+			return -1;
+		}
+		sum += *str - '0';
+		str++;
+	}
+	return sum;
+}
+
+static void usage_and_exit(FILE *out, const char *argv0, int ret)
+{
+	fprintf(out, "Usage: %s [NUMBER]... [ROMAN NUMERAL]...\n", argv0);
+	exit(ret);
+}
+
+static void print_roman(long num, int *ret)
+{
+	char *buf;
+
+	buf = long2roman(num);
+	if (buf) {
+		puts(buf);
+		free(buf);
+	} else {
+		puts("invalid");
+		*ret = 1;
+	}
+}
+
+static void print_numeral(const char *str, int *ret)
+{
+	long num;
+
+	num = roman2long(str);
+	if (num != -1) {
+		printf("%ld\n", num);
+	} else {
+		puts("invalid");
+		*ret = 1;
+	}
+}
 
 int main(int argc, const char *argv[])
 {
+	long num;
+	int i;
+	int ret;
 
-	return 0;
+	if (argc == 1) {
+		usage_and_exit(stderr, argv[0], EXIT_FAILURE);
+	}
+
+	ret = 0;
+	for (i = 1; i < argc; i++) {
+		if (!strcmp(argv[i], "--help")) {
+			usage_and_exit(stdout, argv[0], EXIT_SUCCESS);
+		}
+
+		num = str2long(argv[i]);
+		if (num != -1) {
+			print_roman(num, &ret);
+		} else {
+			print_numeral(argv[i], &ret);
+		}
+	}
+
+	return ret;
 }
 

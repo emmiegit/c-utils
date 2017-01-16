@@ -29,14 +29,21 @@ DEPENDS   := $(SOURCES:.c=.d)
 FLAGS     := \
 	-pipe -ansi \
 	-pedantic -Wall -Wextra -Wshadow -Wmissing-prototypes \
-	-I. -O2 -lc
+	-I. -lc
 
 EXE       := roman
 LIB       := libroman.a
 
 .PHONY: all debug clean
 
-all: $(EXE) $(LIB).a $(LIB).$(SO_EXT)
+all: CFLAGS += -O2
+all: $(EXE) $(LIB)
+
+debug: CFLAGS += -g
+debug: $(EXE) $(LIB)
+
+clean:
+	rm -f $(EXE) $(LIB) $(OBJECTS) $(DEPENDS)
 
 %.o: %.c
 	$(ECHO_CC) $(FLAGS) $(CFLAGS) -c -o $@ $<
@@ -44,10 +51,10 @@ all: $(EXE) $(LIB).a $(LIB).$(SO_EXT)
 %.d: %.c
 	$(ECHO_DEP) $(FLAGS) -MM $< > $@
 
-$(LIB): $(OBJECTS)
-	$(ECHO_AR) rcs $@ $^
-
 $(EXE): $(OBJECTS) $(EXE_OBJS)
 	$(ECHO_LD) $(FLAGS) $(CFLAGS) -o $@ $^
+
+$(LIB): $(OBJECTS)
+	$(ECHO_AR) rcs $@ $^
 
 -include $(DEPENDS) $(EXE_DEPS)
