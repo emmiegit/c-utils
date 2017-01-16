@@ -1,4 +1,4 @@
-.PHONY: all release debug force forcedebug clean
+.PHONY: all release debug clean
 
 CC = gcc
 FLAGS = -ansi -Wall -Wextra -pipe -O3
@@ -34,10 +34,6 @@ bin/%: %.c
 
 debug:
 	@make EXTRA_FLAGS='-g -Og'
-
-force: clean all
-
-forcedebug: clean debug
 
 clean:
 	@echo '[RMDIR] bin'
