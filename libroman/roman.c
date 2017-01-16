@@ -64,7 +64,7 @@ long roman2long(const char *str)
 long nroman2long(const char *str, size_t len)
 {
 	int neg;
-	long sum, partial;
+	long sum, part;
 	short last, cur;
 	size_t i;
 
@@ -84,7 +84,7 @@ long nroman2long(const char *str, size_t len)
 		neg = 0;
 	}
 	last = get_digit(str[i++]);
-	partial = last;
+	part = last;
 	if (last < 0) {
 		return -1;
 	}
@@ -99,17 +99,18 @@ long nroman2long(const char *str, size_t len)
 		if (cur < 0) {
 			return -1;
 		}
-		if (cur > last) {
-			sum = cur - partial;
-			partial = 0;
-		} else {
-			partial += cur;
-			if (cur < last) {
-				last = cur;
-			}
+
+		if (last == cur) {
+			part += cur;
+		} else if (last < cur) {
+			part = cur - part;
+		} else { /* last > cur */
+			sum += part;
+			part = cur;
 		}
+		last = cur;
 	}
-	sum += partial;
+	sum += part;
 
 	/* Ignore trailing whitespace */
 	for (; i < len; i++) {
