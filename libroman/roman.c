@@ -99,12 +99,14 @@ long nroman2long(const char *str, size_t len)
 		if (cur < 0) {
 			return -1;
 		}
-		partial += cur;
 		if (cur > last) {
 			sum = cur - partial;
 			partial = 0;
-		} else if (cur < last) {
-			last = cur;
+		} else {
+			partial += cur;
+			if (cur < last) {
+				last = cur;
+			}
 		}
 	}
 	sum += partial;
