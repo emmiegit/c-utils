@@ -27,11 +27,8 @@
 
 #include <stddef.h>
 
-long roman2long(const char *str);
-char *long2roman(long num);
-
-long nroman2long(const char *str, size_t len);
-int long2nroman(long num, char *buf, size_t len);
+long romantolong(const char *str, size_t len);
+int longtoroman(long num, char *buf, size_t len);
 
 #endif /* __ROMAN_H */
 

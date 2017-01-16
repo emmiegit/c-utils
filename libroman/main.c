@@ -55,12 +55,10 @@ static void usage_and_exit(FILE *out, const char *argv0, int ret)
 
 static void print_roman(long num, int *ret)
 {
-	char *buf;
+	char buf[256];
 
-	buf = long2roman(num);
-	if (buf) {
+	if (longtoroman(num, buf, sizeof(buf)) > 0) {
 		puts(buf);
-		free(buf);
 	} else {
 		puts("invalid");
 		*ret = 1;
@@ -71,7 +69,7 @@ static void print_numeral(const char *str, int *ret)
 {
 	long num;
 
-	num = roman2long(str);
+	num = romantolong(str, strlen(str));
 	if (num != -1) {
 		printf("%ld\n", num);
 	} else {

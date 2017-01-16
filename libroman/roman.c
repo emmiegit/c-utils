@@ -27,41 +27,35 @@
 
 #include "roman.h"
 
-static const struct digit_value {
+#define ARRAY_SIZE(x)	(sizeof(x) / sizeof((x)[0]))
+
+static const struct symbol_value {
 	char ch;
 	short value;
-} digits[] = {
+} symbols[] = {
 	{ 'I', 1 },
 	{ 'V', 5 },
 	{ 'X', 10 },
 	{ 'L', 50 },
 	{ 'C', 100 },
 	{ 'D', 500 },
-	{ 'M', 1000 },
-	{ '\0', -1 }
+	{ 'M', 1000 }
 };
 
 static short get_digit(char ch)
 {
-	const struct digit_value *dv;
+	size_t i;
 
 	ch = toupper(ch);
-	dv = &digits[0];
-	while (dv->ch) {
-		if (dv->ch == ch) {
-			return dv->value;
+	for (i = 0; i < ARRAY_SIZE(symbols); i++) {
+		if (symbols[i].ch == ch) {
+			return symbols[i].value;
 		}
-		dv++;
 	}
 	return -1;
 }
 
-long roman2long(const char *str)
-{
-	return nroman2long(str, strlen(str));
-}
-
-long nroman2long(const char *str, size_t len)
+long romantolong(const char *str, size_t len)
 {
 	int neg;
 	long sum, part;
@@ -77,12 +71,27 @@ long nroman2long(const char *str, size_t len)
 
 	/* Set initial values and flags */
 	sum = 0;
-	if (str[0] == '-') {
+	if (str[i] == '-') {
 		neg = 1;
 		i++;
+	} else if (str[i] == 'N') {
+		neg = 1;
+		i++;
+		if (i == len) {
+			/* Plain "N" means zero */
+			return 0;
+		}
 	} else {
 		neg = 0;
 	}
+
+	/* Ignore middle whitespace */
+	for (; isspace(str[i]); i++) {
+		if (i == len) {
+			return -1;
+		}
+	}
+
 	last = get_digit(str[i++]);
 	part = last;
 	if (last < 0) {
@@ -122,19 +131,71 @@ long nroman2long(const char *str, size_t len)
 	return (!neg) ? sum : -sum;
 }
 
-char *long2roman(long num)
+int longtoroman(long num, char *buf, size_t len)
 {
-	(void)num;
-	/* TODO */
-	return NULL;
-}
+	size_t i, bytes;
 
-int long2nroman(long num, char *buf, size_t len)
-{
-	(void)num;
-	(void)buf;
-	(void)len;
-	/* TODO */
-	return -1;
+	/* Special cases */
+	if (len == 0) {
+		return -1;
+	}
+	if (num == 0) {
+		buf[0] = 'N';
+		buf[1] = '\0';
+		return 1;
+	}
+
+	/* Handling for the sign */
+	if (num < 0) {
+		num = -num;
+		buf[0] = '-';
+		bytes = 1;
+	} else {
+		bytes = 0;
+	}
+
+	/* Iterate through the symbols, skipping the 5's (e.g. 50, 500) */
+	for (i = 0; i < ARRAY_SIZE(symbols); i += 2) {
+		const struct symbol_value *sv;
+		long digit;
+
+		sv = &symbols[ARRAY_SIZE(symbols) - i - 1];
+		digit = num / sv->value;
+		num = num % sv->value;
+
+		/* Optimize by skipping zero */
+		if (digit == 0) {
+			continue;
+		}
+
+		/*
+		 * Traditionally, we use subtractive forms for 4 and 9, such as
+		 * XL and XC for 40 and 90.
+		 *
+		 * For some digit n, the form is (n)(n + 1) for 4* and
+		 * (n)(n + 2) for 9*. This can be reduced to an algebraic expression
+		 * to calculate the offset from n, which is what "off" is.
+		 *
+		 * For other digits, it's simply that number of (n)s.
+		 */
+		if ((i != 0) && (digit == 4 || digit == 9)) {
+			int off = (digit + 1) / 5;
+			if (bytes + 2 >= len) {
+				return -1;
+			}
+			buf[bytes]     = sv->ch;
+			buf[bytes + 1] = (sv+off)->ch;
+			bytes += 2;
+		} else {
+			if (bytes + digit >= len) {
+				return -1;
+			}
+			memset(buf + bytes, sv->ch, digit);
+			bytes += digit;
+		}
+
+	}
+	buf[bytes] = '\0';
+	return bytes;
 }
 

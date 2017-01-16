@@ -1,0 +1,43 @@
+.\"
+.\" romantolong.3
+.\"
+.\" Copyright 2017 Ammon Smith
+.\"
+.\" Permission is hereby granted, free of charge, to any person obtaining a copy
+.\" of this software and associated documentation files (the "Software"), to
+.\" deal in the Software without restriction, including without limitation the
+.\" rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+.\" sell copies of the Software, and to permit persons to whom the Software is
+.\" furnished to do so, subject to the following conditions:
+.\"
+.\" The above copyright notice and this permission notice shall be included in
+.\" all copies or substantial portions of the Software.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+.\" IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+.\" FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+.\" AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+.\" LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+.\" OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+.\" SOFTWARE.
+.\"
+.TH ROMANTOLONG 3 2017-01-16 "Ammon Smith" "libroman"
+.SH NAME
+romantolong, longtoroman - convert roman numerals
+.SH SYNPOSIS
+.nf
+.B #include <roman.h>
+.sp
+.BI "long romantolong(const char *" str ", size_t " len ");"
+.BI "int longtoroman(long " num ", char *" buf ", size_t " len ");"
+.SH DESCRIPTION
+.\" TODO
+.SH RETURN VALUE
+.P
+\fBromantolong\fP() returns the equivalent \fBlong\fP value of the roman numeral in the string, or -1 otherwise.
+.P
+\fBlongtoroman\fP() returns the number of bytes written (not including the null terminator), or -1 if the buffer is too small. If -1 is returned, the contents of the buffer are undefined.
+.SH NOTES
+Since \fBromantolong\fP() can legitimately return -1, if the calling program accepts negative values, it should search the string for the `-' or `N` character and replace it with whitespace, negating the returned value if needed.
+.SH SEE ALSO
+\fBstrtol\fP(3)
