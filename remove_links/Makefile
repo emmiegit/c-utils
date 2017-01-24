@@ -19,26 +19,37 @@
 
 .PHONY: all clean debug
 
-GITHASH := $(shell git rev-parse --short @)
-FLAGS   := -ansi -pipe -Wall -Wextra -pedantic -O2 -I. -DGIT_HASH='"$(GITHASH)"'
+GITHASH   := $(shell git rev-parse --short @)
+FLAGS     := \
+	-pipe \
+	-ansi -pedantic -Wall -Wextra -Wshadow -Wmissing-prototypes \
+	-I. \
+	-DGIT_HASH='"$(GITHASH)"'
 
-CC      := gcc
-SOURCES := $(wildcard *.c)
-OBJECTS := $(SOURCES:.c=.o)
-DEPENDS := $(SOURCES:.c=.d)
-EXE     := rmln
+V         ?= 0
 
+ECHO_CC_0  = @echo '[CC] $@'; $(CC)
+ECHO_CC_1  = $(CC)
+ECHO_CC    = $(ECHO_CC_$(V))
+
+ECHO_LD_0  = @echo '[LD] $@'; $(CC)
+ECHO_LD_1  = $(CC)
+ECHO_LD    = $(ECHO_LD_$(V))
+
+SOURCES   := $(wildcard *.c)
+OBJECTS   := $(SOURCES:.c=.o)
+DEPENDS   := $(SOURCES:.c=.d)
+EXE       := rmln
+
+all: CFLAGS += -O2
 all: $(EXE)
-debug:
-	$(MAKE) $(EXE) CFLAGS='-g'
+
+debug: CFLAGS += -g
+debug: $(EXE)
 
 $(EXE): $(OBJECTS)
-	$(CC) $(FLAGS) $(CFLAGS) -o $@ $^
+	$(ECHO_LD) $(FLAGS) $(CFLAGS) -o $@ $^
 
 %.o: %.c
-	$(CC) $(FLAGS) $(CFLAGS) -c -o $@ $<
+	$(ECHO_CC) $(FLAGS) $(CFLAGS) -c -o $@ $<
 
-%.d: %.c
-	$(CC) $(FLAGS) -M $< > $@
-
--include: $(DEPENDS)
