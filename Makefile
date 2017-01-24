@@ -28,6 +28,10 @@ bin/xfiller: xfiller.c
 	@echo '[CC] $(@F)'
 	@$(CC) $(FLAGS) $(EXTRA_FLAGS) -lX11 -o bin/$(@F) $<
 
+bin/latex-autocompile: latex-autocompile.c
+	@echo '[CC] $(@F)'
+	@$(CC) $(FLAGS) $(EXTRA_FLAGS) -pthread -o bin/$(@F) $<
+
 bin/%: %.c
 	@echo '[CC] $(@F)'
 	@$(CC) $(FLAGS) $(EXTRA_FLAGS) $< -o bin/$(@F)

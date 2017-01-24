@@ -1,87 +1,227 @@
 #define _XOPEN_SOURCE 500
 
 #include <errno.h>
-#include <limits.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
 
-#include <sys/inotify.h>
 #include <sys/types.h>
+#include <sys/inotify.h>
 #include <sys/wait.h>
+#include <limits.h>
+#include <pthread.h>
+#include <signal.h>
 #include <unistd.h>
 
-#define USE_VFORK
 #define DEFAULT_DIRECTORY	"."
 #define COMPILE_COMMAND		"pdflatex"
+#define VIEW_COMMAND		"mupdf"
+#define SOURCE_EXTENSION	".tex"
+#define SOURCE_EXTENSION_LEN	4
+#define PDF_EXTENSION		".pdf"
+#define PDF_EXTENSION_LEN	4
 
-static void call_command(char *filename)
+#define UNUSED(x)		((void)(x))
+
+static pthread_mutex_t pdf_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t pdf_cond = PTHREAD_COND_INITIALIZER;
+static char *pdf_filename;
+static pid_t pdf_pid;
+
+static int endswith(const char *str, const char *suffix, size_t suflen)
+{
+	size_t i, len;
+
+	len = strlen(str);
+	for (i = 0; i < suflen; i++) {
+		if (str[i + len - suflen] != suffix[i]) {
+			return 0;
+		}
+	}
+	return 1;
+}
+
+static char *replace_ext(const char *str, const char *ext, size_t extlen)
+{
+	size_t i, len;
+	char *new;
+
+	len = strlen(str);
+	new = malloc(len);
+	if (!new) {
+		perror("Unable to allocate memory");
+		exit(1);
+	}
+	memcpy(new, str, len - extlen);
+	for (i = 0; i < extlen; i++) {
+		new[i + len - extlen] = ext[i];
+	}
+	new[len] = '\0';
+	return new;
+}
+
+static int call_command(const char *filename)
 {
 	pid_t pid;
+	int ret;
 
-#ifdef USE_VFORK
-	pid = vfork();
-#else
-	pid = fork();
-#endif /* USE_VFORK */
-	if (pid < 0) {
-		perror("Unable to fork to run compilation command");
-		exit(EXIT_FAILURE);
+	if ((pid = vfork()) < 0) {
+		perror("Unable to fork");
+		exit(-1);
 	}
 
 	if (pid == 0) {
 		/* We are the child */
 		close(STDIN_FILENO);
 		execlp(COMPILE_COMMAND, COMPILE_COMMAND, filename, (char *)NULL);
-		perror("Unable to exec to run compilation command");
-		_exit(EXIT_FAILURE);
+		_exit(-1);
 	} else {
-		/* We are the parent */
-		waitpid(pid, NULL, 0);
+		waitpid(pid, &ret, 0);
 	}
+	return ret;
+}
+
+static void pdf_reopen(void)
+{
+	if (pdf_pid > 0) {
+		if (kill(pdf_pid, SIGTERM)) {
+			perror("Unable to send SIGTERM");
+		}
+	}
+	if ((pdf_pid = vfork()) < 0) {
+		perror("Unable to fork");
+		exit(-1);
+	}
+	if (pdf_pid == 0) {
+		/* We are the child */
+		close(STDIN_FILENO);
+		close(STDOUT_FILENO);
+		close(STDERR_FILENO);
+		execlp(VIEW_COMMAND, VIEW_COMMAND, pdf_filename, (char *)NULL);
+		_exit(-1);
+	}
+}
+
+static void pdf_refresh(void)
+{
+	if (pdf_pid <= 0) {
+		return;
+	}
+	if (kill(pdf_pid, SIGHUP)) {
+		perror("Unable to send SIGHUP");
+		return;
+	}
+}
+
+static void pdf_cleanup(int signum, siginfo_t *inf, void *ucontext)
+{
+	pid_t ret;
+
+	UNUSED(signum);
+	UNUSED(ucontext);
+
+	if (inf->si_pid == pdf_pid) {
+		pdf_pid = 0;
+	}
+
+	ret = waitpid(inf->si_pid, NULL, 0);
+	if (ret <= 0 && errno != ECHILD) {
+		perror("Unable to wait");
+	}
+}
+
+static void *pdf_main(void *arg)
+{
+	char *last_filename;
+
+	UNUSED(arg);
+
+	last_filename = NULL;
+	for (;;) {
+		if (pthread_mutex_lock(&pdf_mutex)) {
+			exit(-1);
+		}
+		if (pthread_cond_wait(&pdf_cond, &pdf_mutex)) {
+			exit(-1);
+		}
+
+		/*
+		 * These pointers should be identical,
+		 * so "==" is intentional.
+		 */
+		if (!pdf_pid || pdf_filename != last_filename) {
+			pdf_reopen();
+			last_filename = pdf_filename;
+		} else {
+			pdf_refresh();
+		}
+		if (pthread_mutex_unlock(&pdf_mutex)) {
+			exit(-1);
+		}
+
+	}
+	return NULL;
 }
 
 static void read_event(const struct inotify_event *event)
 {
-	time_t now = time(NULL);
+	const time_t now = time(NULL);
 
 	if (event->mask == IN_IGNORED) {
 		return;
 	}
-
-	/* vim creates a file called "4913" for some reason when writing */
-	if (!strcmp(event->name, "4913")) {
+	if (!endswith(event->name, SOURCE_EXTENSION, SOURCE_EXTENSION_LEN)) {
 		return;
 	}
 
 	printf(">> %s", ctime(&now));
-
 	if (event->mask == IN_CREATE) {
-		call_command((char *)event->name);
+		if (call_command(event->name)) {
+			return;
+		}
 	} else {
 		puts("Directory was deleted or moved.");
-		exit(EXIT_SUCCESS);
+		exit(0);
+	}
+
+	free(pdf_filename);
+	pdf_filename = replace_ext(event->name, PDF_EXTENSION, PDF_EXTENSION_LEN);
+	if (pthread_cond_broadcast(&pdf_cond)) {
+		exit(-1);
+	}
+}
+
+void setup(const char *directory)
+{
+	struct sigaction act;
+
+	if (chdir(directory)) {
+		fprintf(stderr, "Unable to change directory to \"%s\": %s.\n",
+			directory, strerror(errno));
+		exit(EXIT_FAILURE);
+	}
+
+	act.sa_flags = SA_SIGINFO;
+	act.sa_sigaction = pdf_cleanup;
+	if (sigaction(SIGCHLD, &act, NULL)) {
+		perror("Unable to set SIGCHLD action");
+		exit(EXIT_FAILURE);
 	}
 }
 
 int main(int argc, const char *argv[])
 {
-	const char *directory = DEFAULT_DIRECTORY;
+	const char *directory;
+	pthread_t view_thread;
 	int inotify_fd;
-	int wd, ret;
+	int wd;
 
+	directory = DEFAULT_DIRECTORY;
 	if (argc > 1) {
 		directory = argv[1];
 	}
-
-	ret = chdir(directory);
-	if (ret) {
-		fprintf(stderr, "Unable to change directory to \"%s\": %s.\n",
-			directory, strerror(errno));
-		return EXIT_FAILURE;
-	}
-
+	setup(directory);
 	inotify_fd = inotify_init1(IN_CLOEXEC);
 	if (inotify_fd < 0) {
 		perror("Unable to initialize inotify");
@@ -94,24 +234,26 @@ int main(int argc, const char *argv[])
 		return EXIT_FAILURE;
 	}
 
-	while (1) {
-		char buf[sizeof(struct inotify_event) + NAME_MAX + 1];
+	if (pthread_create(&view_thread, NULL, pdf_main, NULL)) {
+		fprintf(stderr, "Unable to spawn view thread: %s.\n", strerror(errno));
+		return EXIT_FAILURE;
+	}
+	printf("Listening on \"%s\"\n", directory);
+	for (;;) {
+		char buf[sizeof(struct inotify_event) + PATH_MAX + 1];
 		ssize_t len;
 
 		len = read(inotify_fd, buf, sizeof(buf));
-
 		if (len < 0) {
 			if (errno == EINTR) {
-				return EXIT_SUCCESS;
+				return 0;
 			}
-
 			perror("Unable to read from inotify");
 			return EXIT_FAILURE;
 		}
-
 		read_event((struct inotify_event *)buf);
 	}
 
-	return EXIT_SUCCESS;
+	return 0;
 }
 
