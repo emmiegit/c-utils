@@ -15,7 +15,7 @@ int main()
 
 	printw("Start entering characters:\n(Hit 'q' to quit.)\n");
 
-	for (counter = 0;; counter++) {
+	for (counter = 0; 1; counter++) {
 		int ch;
 
 		if (counter >= 25) {

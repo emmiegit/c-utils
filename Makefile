@@ -16,7 +16,7 @@ bin:
 	@echo '[MKDIR] bin'
 	@mkdir -p bin
 
-bin/cgetch: cgetch.c
+bin/getch: getch.c
 	@echo '[CC] $(@F)'
 	@$(CC) $(FLAGS) $(EXTRA_FLAGS) -lncurses -o bin/$(@F) $<
 
