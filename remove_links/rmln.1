@@ -1,4 +1,4 @@
-.TH RMLN 1 2016-01-29 "moreutils" "moreutils"
+.TH RMLN 1 2016-01-29 "c-utils" "c-utils"
 .\" %%%LICENSE_START(GPLv2+_DOC_FULL)
 .\" This is free documentation; you can redistribute it and/or
 .\" modify it under the terms of the GNU General Public License as
@@ -31,32 +31,34 @@ rmln [\fB\-\-help\fP | \fB\-\-version\fP]
 .P
 Mandatory arguments to long options are mandatory for short options too.
 .TP
-\fB\-s\fP, \fB\-\-symbolic-only\fP
+.BR \-s ", " \-\-symbolic\-only
 Only delete symbolic links.
 .TP
-\fB\-l\fP, \fB\-\-hard-only\fP
+.BR \-l ", " \-\-hard\-only
 Only delete files with more than one hard link. Note that this can delete symbolic links if they are linked in multiple places.
 .TP
-\fB\-i\fP, \fB\-\-interactive\fP
+.BR \-i ", " \-\-interactive
 Prompt before every removal.
 .TP
-\fB\-r\fP, \fB\-\-recursive\fP
+.BR \-f ", " \-\-force
+Any errors or missing files are ignored, with no messages printed. However, even with this flag enabled rest assured that the program will not delete non\-link files.
+.TP
+.BR \-r ", " \-\-recursive
 Recurse into subdirectories and delete any links inside based on the passed options. This program will never delete the directories themselves.
 .TP
-\fB\-v\fP, \fB\-\-verbose\fP
+.BR \-v ", " \-\-verbose
 Print the name of every file as they are removed.
 .TP
-.TP
-\fB\-h\fP, \fB\-\-help\fP
+.BR \-h ", " \-\-help
 List all options and what they do.
 .TP
-\fB\-V\fP, \fB\-\-version\fP
-Print the version and a summary of the software license.
+.BR \-V ", " \-\-version
+Print the program's version and a summary of its build environment and software license.
 .SH RETURN CODES
-\fBrmln\fP returns 0 on success, and nonzero when errors occur.
+\fBrmln\fP returns 0 on success, and nonzero on error.
 .SH SEE ALSO
 .TP
 \fBrm\fP(1), \fBln\fP(1)
 .SH AUTHOR
 .TP
-Ammon Smith (ammon.i.smith@gmail.com)
+Ammon Smith (ammon.i.smith\fR@\fRgmail.com)
