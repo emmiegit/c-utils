@@ -97,10 +97,13 @@ static int unlink_path(const char *const path, const mode_t mode, const unsigned
 {
 	if (opt.interactive) {
 		if (!prompt(path, mode, links)) {
-			return 1;
+			return 0;
 		}
 	}
-	if (unlink(path) && !opt.force) {
+	if (unlink(path)) {
+		if (opt.force) {
+			return 0;
+		}
 		fprintf(stderr, "%s: cannot remove '%s': %s\n",
 			opt.argv0, path, strerror(errno));
 		return 1;
@@ -115,22 +118,23 @@ static int unlink_directory(const char *const path)
 {
 	DIR *dir;
 	struct dirent *entry;
-	int ret, status = 0;
+	int status = 0;
 
 	dir = opendir(path);
 	if (!dir) {
+		if (opt.force) {
+			return 0;
+		}
 		fprintf(stderr, "%s: cannot open '%s': %s\n",
 			opt.argv0, path, strerror(errno));
 
 		return 1;
 	}
-
 	if (opt.interactive) {
 		if (!prompt(path, S_IFDIR, 0)) {
 			return 0;
 		}
 	}
-
 	while ((entry = readdir(dir))) {
 		char *fullpath;
 
@@ -144,7 +148,6 @@ static int unlink_directory(const char *const path)
 				opt.argv0, strerror(errno));
 			return 1;
 		}
-
 		sprintf(fullpath, "%s/%s", path, entry->d_name);
 
 		if (entry->d_type == DT_DIR) {
@@ -154,17 +157,13 @@ static int unlink_directory(const char *const path)
 		} else {
 			status += remove_recursive(fullpath);
 		}
-
 		free(fullpath);
 	}
-
-	ret = closedir(dir);
-	if (ret) {
+	if (closedir(dir)) {
 		fprintf(stderr, "%s: cannot close '%s': %s\n",
 			opt.argv0, path, strerror(errno));
 		return 1;
 	}
-
 	return status;
 }
 
@@ -172,14 +171,18 @@ int remove_link(const char *const path)
 {
 	struct stat statbuf;
 	if (lstat(path, &statbuf)) {
-		if (!opt.argv0) puts("prog null");
-		if (!path) puts("path null");
+		if (opt.force) {
+			return 0;
+		}
 		fprintf(stderr, "%s: unable to stat '%s': %s\n",
 			opt.argv0, path, strerror(errno));
 		return 1;
 	}
 
 	if (S_ISDIR(statbuf.st_mode)) {
+		if (opt.force) {
+			return 0;
+		}
 		print_is_a_directory(path);
 		return 1;
 	} else if (statbuf.st_nlink > 1 && IF_DELETE_HARD_LINKS(opt.mode)) {
@@ -188,6 +191,9 @@ int remove_link(const char *const path)
 		return unlink_path(path, statbuf.st_mode, 0);
 	}
 
+	if (opt.force) {
+		return 0;
+	}
 	print_not_a_link(path);
 	return 1;
 }
@@ -196,6 +202,9 @@ int remove_recursive(const char *const path)
 {
 	struct stat statbuf;
 	if (lstat(path, &statbuf)) {
+		if (opt.force) {
+			return 0;
+		}
 		fprintf(stderr, "%s: unable to stat '%s': %s\n",
 			opt.argv0, path, strerror(errno));
 		return 1;
@@ -209,6 +218,9 @@ int remove_recursive(const char *const path)
 		return unlink_path(path, statbuf.st_mode, 0);
 	}
 
+	if (opt.force) {
+		return 0;
+	}
 	print_not_a_link(path);
 	return 1;
 }
