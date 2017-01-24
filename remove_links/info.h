@@ -24,7 +24,7 @@
 #define PROGRAM_NAME			"rmln"
 #define PROGRAM_VERSION_MAJOR		0
 #define PROGRAM_VERSION_MINOR		1
-#define PROGRAM_VERSION_PATCH		1
+#define PROGRAM_VERSION_PATCH		2
 #define PROGRAM_AUTHORS			"Ammon Smith"
 #define PROGRAM_YEARS           	"2016-2017"
 
