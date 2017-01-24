@@ -19,7 +19,7 @@ A "safer" `rm`, since it only deletes links. That is, it will only delete a file
 A "standard library" or something. Not super useful right now. The eventual idea is to centralize a bunch of useful things that I use in one place.
 
 ### Compilation and Running
-Generally I write ANSI C, so you should have no problem finding a compatible compiler. Other than that, dependencies vary on the program. For example, `xfiller` obviously depends on Xlib.
+Generally I write strictly ANSI C, so you should have no problem finding a compatible compiler. Other than that, dependencies vary on the program. For example, `xfiller` obviously depends on Xlib.
 
 Be sure you invoke `make` in each directory manually, since the top level Makefile only compiles sources directly in that directory.
 

@@ -21,8 +21,6 @@
 #ifndef __OPTIONS_H
 #define __OPTIONS_H
 
-#include <stdbool.h>
-
 #define DELETE_SYMBOLIC_LINKS		0x1
 #define DELETE_HARD_LINKS		0x2
 #define DELETE_ALL_LINKS		(DELETE_SYMBOLIC_LINKS | DELETE_HARD_LINKS)
@@ -31,12 +29,18 @@
 #define IF_DELETE_HARD_LINKS(x)		((x) & DELETE_HARD_LINKS)
 
 struct options {
-	const char *program_name;
-	unsigned char mode;
-	bool interactive;
-	bool recursive;
-	bool verbose;
+	const char *argv0;
+	int mode;
+
+	unsigned interactive : 1;
+	unsigned recursive   : 1;
+	unsigned force       : 1;
+	unsigned verbose     : 1;
 };
+
+extern struct options opt;
+
+int parse_args(int argc, char *argv[]);
 
 #endif /* __OPTIONS_H */
 

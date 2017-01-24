@@ -20,23 +20,21 @@
 
 #include <stdlib.h>
 
-#include "arguments.h"
+#include "options.h"
 #include "remove.h"
 
-/* Function implementations */
-int main(int argc, const char *argv[])
+int main(int argc, char *argv[])
 {
 	int (*remove_func)(const char *path);
 	int i, ret;
 
-	opt.program_name = argv[0];
-	i = parse_arguments(argc, argv);
+	opt.argv0 = argv[0];
+	i = parse_args(argc, argv);
 	remove_func = (opt.recursive) ? remove_recursive : remove_link;
 
-	for (ret = 0; i < argc; i++) {
+	ret = 0;
+	for (; i < argc; i++) {
 		ret += (*remove_func)(argv[i]);
 	}
-
-	return ret ? EXIT_FAILURE : EXIT_SUCCESS;
+	return (ret) ? EXIT_FAILURE : EXIT_SUCCESS;
 }
-
