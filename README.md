@@ -12,7 +12,7 @@ All files are available under the MIT license unless otherwise specified. Check 
 ### Directories
 **`rmln`** (in directory `remove_links/`)
 
-A "safer" `rm`, since it only deletes links. You can have it delete only symbolic or hard links, though by default it will remove both. Includes a man page at no extra charge, but only if you order now.
+A "safer" `rm`, since it only deletes links. That is, it will only delete a file if it is either (1) symbolic or (2) has more than one hard link. This makes file deletion less stressful, since it's not possible to delete files that unique, i.e. only exist in one place. Also includes a man page.
 
 **`libais`**
 
