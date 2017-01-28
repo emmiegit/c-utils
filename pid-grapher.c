@@ -40,6 +40,7 @@ static void write_pid2(int signum)
 	UNUSED(signum);
 
 	write_pid();
+	fflush(fh);
 }
 
 static void setup(const char *path)
