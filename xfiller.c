@@ -39,7 +39,7 @@ static void create_window(Display *dis, Atom *ptr)
 	XSelectInput(dis, win, KeyPressMask);
 	XMapWindow(dis, win);
 
-	sprintf(title, "xfiller - %d", getpid());
+	sprintf(title, "xfiller - pid %d", getpid());
 	window_name.value = (unsigned char *)title;
 	window_name.encoding = XA_STRING;
 	window_name.format = 8;
