@@ -12,11 +12,8 @@
  */
 
 #include <stdio.h>
-#include <string.h>
 
 #include "input.h"
-
-size_t prompt_len;
 
 #if defined(USE_READLINE)
 
@@ -30,14 +27,13 @@ void input_init(void)
 	rl_editing_mode = 0;
 }
 
-const char *get_line(const char *prompt)
+const char *get_line(void)
 {
 	static char *line;
 
-	prompt_len = strlen(prompt);
 	if (line)
 		free(line);
-	line = readline(prompt);
+	line = readline(PROMPT);
 	if (line && line[0])
 		add_history(line);
 	return line;
@@ -49,12 +45,11 @@ void input_init(void)
 {
 }
 
-const char *get_line(const char *prompt)
+const char *get_line(void)
 {
 	static char line[4096];
 
-	prompt_len = strlen(prompt);
-	fputs(prompt, stdout);
+	fputs(PROMPT, stdout);
 	return fgets(line, sizeof(line), stdin);
 }
 

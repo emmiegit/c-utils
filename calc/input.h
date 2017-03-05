@@ -14,10 +14,11 @@
 #ifndef _INPUT_H_
 #define _INPUT_H_
 
-void input_init(void);
-const char *get_line(const char *prompt);
+#define PROMPT		"> "
+#define PROMPT_LEN	2
 
-extern size_t prompt_len;
+void input_init(void);
+const char *get_line(void);
 
 #endif /* _INPUT_H_ */
 

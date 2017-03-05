@@ -157,7 +157,7 @@ void yyerror(const char *message)
 {
     size_t i, len;
 
-    len = yy_location.first_column + prompt_len;
+    len = yy_location.first_column + PROMPT_LEN;
     for (i = 0; i < len; i++)
         putc(' ', stderr);
     fputs("^\n", stderr);

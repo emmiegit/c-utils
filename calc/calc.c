@@ -45,7 +45,7 @@ void execute_file(void)
 	while (result.running) {
 		const char *line;
 
-		line = get_line("> ");
+		line = get_line();
 		if (!line) {
 			putchar('\n');
 			return;
