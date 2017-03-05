@@ -17,7 +17,7 @@
 #define PROGRAM_NAME				"calc"
 #define PROGRAM_VERSION_MAJOR			0
 #define PROGRAM_VERSION_MINOR			4
-#define PROGRAM_VERSION_PATCH			1
+#define PROGRAM_VERSION_PATCH			2
 
 #ifndef GIT_HASH
 # define GIT_HASH                               "nogithash"
