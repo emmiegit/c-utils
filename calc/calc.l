@@ -40,6 +40,7 @@ EXIT            ([qQ]([uU][iI][tT])?|[eE][xX][iI][tT])
 NUM             ([0-9]+\.?[0-9]*([eE][-+]?[0-9]+)?)
 HEX             (0[xX][0-9a-fA-F]+)
 INF             ([iI][nN][fF]([iI][nN][iI][tT][yY])?)
+NAN             ([nN][aA][nN])
 LOG             ([lL][oO][gG])
 LN              ([lL][nN])
 
@@ -49,6 +50,7 @@ LN              ([lL][nN])
 {EXIT}          { return EXIT; }
 ({NUM}|{HEX})   { yylval.num = parse_num(yytext); return NUMBER; }
 {INF}           { yylval.num = INFINITY; return NUMBER; }
+{NAN}           { yylval.num = NAN; return NUMBER; }
 [pP][iI]        { yylval.num = M_PI; return NUMBER; }
 [eE]            { yylval.num = M_E; return NUMBER; }
 "+"             { return '+'; }
