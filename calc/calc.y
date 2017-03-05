@@ -53,6 +53,7 @@ int yydebug = 1;
 %token COS
 %token COSH
 %token DIM
+%token EXIT
 %token EXP
 %token EXP2
 %token FLOOR
@@ -88,6 +89,7 @@ top
 line
         : '\n'                          /* do nothing */
         | expr '\n'                     { print_result($1); }
+        | EXIT '\n'                     { YYACCEPT; }
         ;
 
 expr

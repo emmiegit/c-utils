@@ -23,6 +23,7 @@
 #include "y.tab.h"
 
 #include "calc.h"
+#include "main.h"
 
 static double parse_num(const char *str);
 
@@ -73,6 +74,7 @@ LN              ([lL][nN])
 "cos"           { return COS; }
 "cosh"          { return COSH; }
 "dim"           { return DIM; }
+("exit"|"quit") { return EXIT; }
 "exp"           { return EXP; }
 "exp2"          { return EXP2; }
 "floor"         { return FLOOR; }

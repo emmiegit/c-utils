@@ -17,16 +17,14 @@
 #include <string.h>
 
 #include "calc.h"
+#include "main.h"
 
 int main(int argc, char *argv[])
 {
 	int i;
 
-	printf("%s v%d.%d.%d\n",
-		PROGRAM_NAME,
-		PROGRAM_VERSION_MAJOR,
-		PROGRAM_VERSION_MINOR,
-		PROGRAM_VERSION_PATCH);
+	print_version();
+
 	if (argc == 1) {
 		if (calc_file("<stdin>", stdin))
 			return 1;
@@ -45,4 +43,22 @@ int main(int argc, char *argv[])
 			abort();
 	}
 	return 0;
+}
+
+void print_version(void)
+{
+	printf("%s v%d.%d.%d [%s]\n"
+		"(%s %s) on %s.\n"
+		"Built %s, %s.\n"
+		"\n",
+		PROGRAM_NAME,
+		PROGRAM_VERSION_MAJOR,
+		PROGRAM_VERSION_MINOR,
+		PROGRAM_VERSION_PATCH,
+		GIT_HASH,
+		COMPILER_NAME,
+		COMPILER_VERSION,
+		PLATFORM_NAME,
+		__DATE__,
+		__TIME__);
 }

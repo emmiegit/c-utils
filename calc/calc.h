@@ -21,11 +21,6 @@ struct file_location {
 	unsigned int last_line, last_column;
 };
 
-#define PROGRAM_NAME		"calc"
-#define PROGRAM_VERSION_MAJOR	0
-#define PROGRAM_VERSION_MINOR	0
-#define PROGRAM_VERSION_PATCH	3
-
 /*
  * Read and parse through the given file,
  * evaluating the expression it comes across.

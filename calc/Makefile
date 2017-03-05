@@ -45,7 +45,7 @@ TARGET     := calc
 
 FLAGS      := -pipe
 WARN_FLAGS := -ansi -pedantic -Wall -Wextra -Wshadow -Wmissing-prototypes
-DEFN_FLAGS :=
+DEFN_FLAGS := -DGIT_HASH='"$(shell git rev-parse --short HEAD)"'
 COMP_FLAGS := -O2 -I.
 LINK_FLAGS := -lm
 YACC_FLAGS :=
