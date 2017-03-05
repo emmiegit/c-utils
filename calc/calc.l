@@ -28,10 +28,16 @@
 
 static double parse_num(const char *str);
 
-#define YY_USER_ACTION                                   \
-    yy_location.line = yylineno;                         \
-    yy_location.first_column = yy_location.last_column;  \
+#define YY_USER_ACTION                                      \
+    yy_location.line = yylineno;                            \
+    yy_location.first_column = yy_location.last_column;     \
     yy_location.last_column += yyleng;
+
+#define SET_STRING(dest)                                    \
+    do {                                                    \
+        (dest).ptr = yytext;                                \
+        (dest).len = yyleng;                                \
+    } while (0)
 %}
 
 %option stack yylineno
@@ -43,6 +49,7 @@ INF             ([iI][nN][fF]([iI][nN][iI][tT][yY])?)
 NAN             ([nN][aA][nN])
 LOG             ([lL][oO][gG])
 LN              ([lL][nN])
+VAR             ([A-Za-z][A-Za-z0-9]*)
 
 %%
 [ \t\r\n]+      /* ignore whitespace */
@@ -72,6 +79,7 @@ LN              ([lL][nN])
 "{"             { return '{'; }
 "}"             { return '}'; }
 ","             { return ','; }
+"="             { return '='; }
 "_"             { yylval.val = last; return NUMBER; }
 "abs"           { return ABS; }
 "acos"          { return ACOS; }
@@ -102,7 +110,8 @@ LN              ([lL][nN])
 "tan"           { return TAN; }
 "tanh"          { return TANH; }
 "trunc"         { return TRUNC; }
-.               { return INVALID; }
+{VAR}           { SET_STRING(yylval.str); return VARIABLE; }
+.               { return yytext[0]; }
 %%
 
 static double parse_num(const char *str)

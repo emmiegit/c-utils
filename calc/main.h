@@ -16,8 +16,8 @@
 
 #define PROGRAM_NAME				"calc"
 #define PROGRAM_VERSION_MAJOR			0
-#define PROGRAM_VERSION_MINOR			3
-#define PROGRAM_VERSION_PATCH			1
+#define PROGRAM_VERSION_MINOR			4
+#define PROGRAM_VERSION_PATCH			0
 
 #ifndef GIT_HASH
 # define GIT_HASH                               "nogithash"
@@ -71,7 +71,9 @@
 # define PLATFORM_NAME                          "Unknown"
 #endif
 
+/* Inline macros */
 #define UNUSED(x)				((void)(x))
+#define ARRAY_SIZE(x)				((sizeof(x)) / (sizeof((x)[0])))
 
 void print_version(void);
 

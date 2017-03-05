@@ -1,5 +1,5 @@
 /*
- * calc.h
+ * types.h
  *
  * calc - a simple CLI calculator
  * Copyright (c) 2017 Ammon Smith
@@ -11,22 +11,32 @@
  *
  */
 
-#ifndef _CALC_H_
-#define _CALC_H_
+#ifndef _TYPES_H_
+#define _TYPES_H_
 
-#include "types.h"
+#include <stddef.h>
 
-/*
- * Read and parse through the given file,
- * evaluating the expression it comes across.
- */
-void execute_file(void);
+struct location {
+	unsigned int line;
+	unsigned int first_column, last_column;
+};
 
-/* Structure definitions */
-/* Externals */
-extern struct location yy_location;
-extern struct result result;
-extern double last;
+struct pair {
+	double x;
+	double y;
+};
 
-#endif /* _CALC_H_ */
+struct result {
+	double answer;
+
+	unsigned running : 1;
+	unsigned has_ans : 1;
+};
+
+struct str {
+	const char *ptr;
+	size_t len;
+};
+
+#endif /* _TYPES_H_ */
 

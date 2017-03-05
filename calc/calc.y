@@ -18,6 +18,7 @@
 #include <stdio.h>
 
 #include "calc.h"
+#include "variables.h"
 
 extern int yylex(void);
 extern int yyparse(void);
@@ -30,37 +31,49 @@ extern int yydebug;
 int yydebug = 1;
 #endif
 
-#define PAIR_X(p)               ((p).x)
-#define PAIR_Y(p)               ((p).y)
+#define PAIR_X(p)                   ((p).x)
+#define PAIR_Y(p)                   ((p).y)
 
-#define ASSIGN_PAIR(p, _x, _y)  \
-    do {                        \
-        (p).x = (_x);           \
-        (p).y = (_y);           \
+#define ASSIGN_PAIR(p, _x, _y)      \
+    do {                            \
+        (p).x = (_x);               \
+        (p).y = (_y);               \
     } while (0)
 
-#define FINISH()                \
-    do {                        \
-        result.has_ans = 0;     \
-        result.running = 0;     \
+#define GET_VARIABLE(x, v)          \
+    do {                            \
+        if (var_get(&(v), &(x)))    \
+            YYABORT;                \
     } while (0)
 
-#define FINISH_ANSWER(x)        \
-    do {                        \
-        result.has_ans = 1;     \
-        result.answer = (x);    \
+#define FINISH()                    \
+    do {                            \
+        result.has_ans = 0;         \
+        result.running = 0;         \
     } while (0)
 
+#define FINISH_ANSWER(x)            \
+    do {                            \
+        result.has_ans = 1;         \
+        result.answer = (x);        \
+    } while (0)
+
+#define FINISH_VARIABLE(v, x)       \
+    do {                            \
+        result.has_ans = 0;         \
+        if (var_set(&(v), (x)))     \
+            YYABORT;                \
+    } while (0)
 %}
 
 %union {
     double val;
     struct pair pair;
-    int opt;
+    struct str str;
 }
 
 /* Precedence order */
-%nonassoc '~' NUMBER OPTION EXIT
+%nonassoc '~' NUMBER VARIABLE EXIT
 %left '+' '-' '*' '/' '^' FLOORDIV LSHIFT RSHIFT AND OR XOR
 %left ','
 %left '(' ')' '[' ']' '{' '}'
@@ -106,10 +119,9 @@ int yydebug = 1;
 %token TAN
 %token TANH
 %token TRUNC
-%token INVALID
 
 %type<val> NUMBER
-%type<opt> OPTION
+%type<str> VARIABLE
 %type<val> expr
 %type<pair> pair
 
@@ -118,11 +130,13 @@ int yydebug = 1;
 %%
 top
         : expr                          { FINISH_ANSWER($1); }
+        | VARIABLE '=' expr             { FINISH_VARIABLE($1, $3); }
         | EXIT                          { FINISH(); YYABORT; }
         ;
 
 expr
         : NUMBER                        { $$ = $1; }
+        | VARIABLE                      { GET_VARIABLE($$, $1); }
         | '+' expr %prec NUMBER         { $$ = +$2; }
         | '-' expr %prec NUMBER         { $$ = -$2; }
         | '~' expr %prec NUMBER         { $$ = ~(long)$2; }
