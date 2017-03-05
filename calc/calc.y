@@ -36,7 +36,7 @@ int yydebug = 1;
 }
 
 /* Precedence order */
-%nonassoc ABS ACOS ASIN ATAN ATANH CBRT CEIL COS COSH EXP EXP2 FLOOR
+%nonassoc ABS ACOS ASIN ATAN ATANH CBRT CEIL COS COSH DIM EXP EXP2 FLOOR GAMMA LOG LOG10 LOG2 LOGB MAX MIN MOD RINT ROUND SIN SINH SQRT TAN TANH TRUNC
 %left '+' '-' '*' '/' '^' FLOORDIV
 %left '(' ')' '[' ']' '{' '}'
 
@@ -52,9 +52,26 @@ int yydebug = 1;
 %token CEIL
 %token COS
 %token COSH
+%token DIM
 %token EXP
 %token EXP2
 %token FLOOR
+%token GAMMA
+%token LOG
+%token LOG10
+%token LOG2
+%token LOGB
+%token MAX
+%token MIN
+%token MOD
+%token RINT
+%token ROUND
+%token SIN
+%token SINH
+%token SQRT
+%token TAN
+%token TANH
+%token TRUNC
 %token INVALID
 
 %type<num> NUMBER
@@ -85,6 +102,7 @@ expr
         | expr '*' expr                 { $$ = $1 * $3; }
         | expr '/' expr                 { $$ = $1 / $3; }
         | expr '^' expr                 { $$ = pow($1, $3); }
+        | expr MOD expr                 { $$ = fmod($1, $3); }
         | expr FLOORDIV expr            { $$ = floor($1 / $3); }
         | ABS expr                      { $$ = fabs($2); }
         | ACOS expr                     { $$ = acos($2); }
@@ -95,8 +113,24 @@ expr
         | CEIL expr                     { $$ = ceil($2); }
         | COS expr                      { $$ = cos($2); }
         | COSH expr                     { $$ = cosh($2); }
+        | DIM expr ',' expr             { $$ = fdim($2, $4); }
         | EXP expr                      { $$ = exp($2); }
         | EXP2 expr                     { $$ = exp2($2); }
         | FLOOR expr                    { $$ = floor($2); }
+        | GAMMA expr                    { $$ = tgamma($2); }
+        | LOG expr                      { $$ = log($2); }
+        | LOG10 expr                    { $$ = log10($2); }
+        | LOG2 expr                     { $$ = log2($2); }
+        | LOGB expr                     { $$ = logb($2); }
+        | MAX expr ',' expr             { $$ = fmax($2, $4); }
+        | MIN expr ',' expr             { $$ = fmin($2, $4); }
+        | RINT expr                     { $$ = rint($2); }
+        | ROUND expr                    { $$ = round($2); }
+        | SIN expr                      { $$ = sin($2); }
+        | SINH expr                     { $$ = sinh($2); }
+        | SQRT expr                     { $$ = sqrt($2); }
+        | TAN expr                      { $$ = tan($2); }
+        | TANH expr                     { $$ = tanh($2); }
+        | TRUNC expr                    { $$ = trunc($2); }
         ;
 %%

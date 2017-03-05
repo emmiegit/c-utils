@@ -50,6 +50,7 @@ INF             ([iI][nN][fF]([iI][nN][iI][tT][yY])?)
 "*"             { return '*'; }
 "/"             { return '/'; }
 "//"            { return FLOORDIV; }
+("%"|"mod")     { return MOD; }
 ("^"|"**")      { return '^'; }
 "("             { return '('; }
 ")"             { return ')'; }
@@ -57,6 +58,7 @@ INF             ([iI][nN][fF]([iI][nN][iI][tT][yY])?)
 "]"             { return ']'; }
 "{"             { return '{'; }
 "}"             { return '}'; }
+","             { return ','; }
 [pP][iI]        { yylval.num = M_PI; return NUMBER; }
 [eE]            { yylval.num = M_E; return NUMBER; }
 "abs"           { return ABS; }
@@ -68,9 +70,25 @@ INF             ([iI][nN][fF]([iI][nN][iI][tT][yY])?)
 "ceil"          { return CEIL; }
 "cos"           { return COS; }
 "cosh"          { return COSH; }
+"dim"           { return DIM; }
 "exp"           { return EXP; }
 "exp2"          { return EXP2; }
 "floor"         { return FLOOR; }
+"gamma"         { return GAMMA; }
+("log"|"ln")    { return LOG; }
+"log10"         { return LOG10; }
+"log2"          { return LOG2; }
+"logb"          { return LOGB; }
+"max"           { return MAX; }
+"min"           { return MIN; }
+"rint"          { return RINT; }
+"round"         { return ROUND; }
+"sin"           { return SIN; }
+"sinh"          { return SINH; }
+"sqrt"          { return SQRT; }
+"tan"           { return TAN; }
+"tanh"          { return TANH; }
+"trunc"         { return TRUNC; }
 .               { return INVALID; }
 %%
 
