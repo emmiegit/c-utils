@@ -118,8 +118,10 @@ static double parse_num(const char *str)
             strerror(errno));
         return NAN;
     }
+#if !defined(NDEBUG)
     if (*ptr || isnan(result))
         abort();
+#endif
     return result;
 }
 

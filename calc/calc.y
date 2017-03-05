@@ -29,11 +29,20 @@ extern void yyerror(const char *);
 extern int yydebug;
 int yydebug = 1;
 #endif
+
+#define ASSIGN_PAIR(p, _x, _y)  \
+    do {                        \
+        (p).x = (_x);           \
+        (p).y = (_y);           \
+    } while (0)
+
+#define PAIR_X(p)               ((p).x)
+#define PAIR_Y(p)               ((p).y)
 %}
 
 %union {
     double num;
-    struct dual dual;
+    struct pair pair;
 }
 
 /* Precedence order */
@@ -86,6 +95,7 @@ int yydebug = 1;
 
 %type<num> NUMBER
 %type<num> expr
+%type<pair> pair
 
 %start top
 
@@ -124,7 +134,7 @@ expr
         | CEIL expr                     { $$ = ceil($2); }
         | COS expr                      { $$ = cos($2); }
         | COSH expr                     { $$ = cosh($2); }
-        | DIM expr ',' expr             { $$ = fdim($2, $4); }
+        | DIM pair                      { $$ = fdim(PAIR_X($2), PAIR_Y($2)); }
         | EXP expr                      { $$ = exp($2); }
         | EXP2 expr                     { $$ = exp2($2); }
         | FLOOR expr                    { $$ = floor($2); }
@@ -133,10 +143,10 @@ expr
         | LOG10 expr                    { $$ = log10($2); }
         | LOG2 expr                     { $$ = log2($2); }
         | LOGB expr                     { $$ = logb($2); }
-        | MAX expr ',' expr             { $$ = fmax($2, $4); }
-        | MIN expr ',' expr             { $$ = fmin($2, $4); }
+        | MAX pair                      { $$ = fmax(PAIR_X($2), PAIR_Y($2)); }
+        | MIN pair                      { $$ = fmin(PAIR_X($2), PAIR_Y($2)); }
         | RINT expr                     { $$ = rint($2); }
-        | RT expr ',' expr              { $$ = pow($4, 1 / $2); }
+        | RT pair                       { $$ = pow(PAIR_Y($2), 1 / PAIR_X($2)); }
         | ROUND expr                    { $$ = round($2); }
         | SIN expr                      { $$ = sin($2); }
         | SINH expr                     { $$ = sinh($2); }
@@ -144,5 +154,12 @@ expr
         | TAN expr                      { $$ = tan($2); }
         | TANH expr                     { $$ = tanh($2); }
         | TRUNC expr                    { $$ = trunc($2); }
+        ;
+
+pair
+        : expr ',' expr                 { ASSIGN_PAIR($$, $1, $3); }
+        | '(' expr ',' expr ')'         { ASSIGN_PAIR($$, $2, $4); }
+        | '[' expr ',' expr ']'         { ASSIGN_PAIR($$, $2, $4); }
+        | '{' expr ',' expr '}'         { ASSIGN_PAIR($$, $2, $4); }
         ;
 %%

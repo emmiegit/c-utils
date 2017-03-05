@@ -25,7 +25,7 @@ struct location {
 	unsigned int first_column, last_column;
 };
 
-struct dual {
+struct pair {
 	double x;
 	double y;
 };
