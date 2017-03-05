@@ -33,6 +33,7 @@ int yydebug = 1;
 
 %union {
     double num;
+    struct dual dual;
 }
 
 /* Precedence order */

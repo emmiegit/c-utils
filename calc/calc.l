@@ -20,11 +20,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "y.tab.h"
-
 #include "calc.h"
 #include "input.h"
 #include "main.h"
+
+#include "y.tab.h"
 
 static double parse_num(const char *str);
 

@@ -14,10 +14,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "y.tab.h"
-
 #include "calc.h"
 #include "input.h"
+
+#include "y.tab.h"
 
 /* Externals */
 struct location yy_location;

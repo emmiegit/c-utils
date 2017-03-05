@@ -25,6 +25,11 @@ struct location {
 	unsigned int first_column, last_column;
 };
 
+struct dual {
+	double x;
+	double y;
+};
+
 /* Externals */
 extern struct location yy_location;
 extern double result;
