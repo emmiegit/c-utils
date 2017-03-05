@@ -21,9 +21,8 @@
 
 /* Externals */
 struct location yy_location;
-double result;
+struct result result;
 double last;
-int done;
 
 /* Parser utilities */
 void lex_new(const char *str);
@@ -40,10 +39,10 @@ static void print_result(double num)
 void execute_file(void)
 {
 	/* Setup */
-	done = 0;
+	result.running = 1;
 	last = 0.0;
 
-	while (!done) {
+	while (result.running) {
 		const char *line;
 
 		line = get_line("> ");
@@ -55,8 +54,15 @@ void execute_file(void)
 		}
 
 		lex_new(line);
-		if (!yyparse())
-			print_result(result);
+		if (yyparse()) {
+			lex_del();
+			continue;
+		}
+
+		if (result.has_ans) {
+			print_result(result.answer);
+			last = result.answer;
+		}
 		lex_del();
 	}
 }

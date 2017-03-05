@@ -45,14 +45,13 @@ LOG             ([lL][oO][gG])
 LN              ([lL][nN])
 
 %%
-#.*$            /* ignore comments */
 [ \t\r\n]+      /* ignore whitespace */
 {EXIT}          { return EXIT; }
-({NUM}|{HEX})   { yylval.num = parse_num(yytext); return NUMBER; }
-{INF}           { yylval.num = INFINITY; return NUMBER; }
-{NAN}           { yylval.num = NAN; return NUMBER; }
-[pP][iI]        { yylval.num = M_PI; return NUMBER; }
-[eE]            { yylval.num = M_E; return NUMBER; }
+({NUM}|{HEX})   { yylval.val = parse_num(yytext); return NUMBER; }
+{INF}           { yylval.val = INFINITY; return NUMBER; }
+{NAN}           { yylval.val = NAN; return NUMBER; }
+[pP][iI]        { yylval.val = M_PI; return NUMBER; }
+[eE]            { yylval.val = M_E; return NUMBER; }
 "+"             { return '+'; }
 "-"             { return '-'; }
 "*"             { return '*'; }
@@ -73,7 +72,7 @@ LN              ([lL][nN])
 "{"             { return '{'; }
 "}"             { return '}'; }
 ","             { return ','; }
-"_"             { yylval.num = last; return NUMBER; }
+"_"             { yylval.val = last; return NUMBER; }
 "abs"           { return ABS; }
 "acos"          { return ACOS; }
 "asin"          { return ASIN; }

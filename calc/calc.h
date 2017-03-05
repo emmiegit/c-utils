@@ -30,11 +30,17 @@ struct pair {
 	double y;
 };
 
+struct result {
+	double answer;
+
+	unsigned running : 1;
+	unsigned has_ans : 1;
+};
+
 /* Externals */
 extern struct location yy_location;
-extern double result;
+extern struct result result;
 extern double last;
-extern int done;
 
 #endif /* _CALC_H_ */
 

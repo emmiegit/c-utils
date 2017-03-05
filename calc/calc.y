@@ -30,23 +30,37 @@ extern int yydebug;
 int yydebug = 1;
 #endif
 
+#define PAIR_X(p)               ((p).x)
+#define PAIR_Y(p)               ((p).y)
+
 #define ASSIGN_PAIR(p, _x, _y)  \
     do {                        \
         (p).x = (_x);           \
         (p).y = (_y);           \
     } while (0)
 
-#define PAIR_X(p)               ((p).x)
-#define PAIR_Y(p)               ((p).y)
+#define FINISH()                \
+    do {                        \
+        result.has_ans = 0;     \
+        result.running = 0;     \
+    } while (0)
+
+#define FINISH_ANSWER(x)        \
+    do {                        \
+        result.has_ans = 1;     \
+        result.answer = (x);    \
+    } while (0)
+
 %}
 
 %union {
-    double num;
+    double val;
     struct pair pair;
+    int opt;
 }
 
 /* Precedence order */
-%nonassoc '\n' NUMBER EXIT
+%nonassoc NUMBER OPTION EXIT
 %left '+' '-' '*' '/' '^' FLOORDIV LSHIFT RSHIFT AND OR XOR
 %left ','
 %left '(' ')' '[' ']' '{' '}'
@@ -54,6 +68,7 @@ int yydebug = 1;
 
 /* Tokens */
 %token NUMBER
+%token OPTION
 %token AND
 %token OR
 %token XOR
@@ -93,16 +108,17 @@ int yydebug = 1;
 %token TRUNC
 %token INVALID
 
-%type<num> NUMBER
-%type<num> expr
+%type<val> NUMBER
+%type<opt> OPTION
+%type<val> expr
 %type<pair> pair
 
 %start top
 
 %%
 top
-        : expr                          { result = $1; }
-        | EXIT                          { done = 1; YYABORT; }
+        : expr                          { FINISH_ANSWER($1); }
+        | EXIT                          { FINISH(); YYABORT; }
         ;
 
 expr
