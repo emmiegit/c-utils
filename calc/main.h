@@ -71,6 +71,8 @@
 # define PLATFORM_NAME                          "Unknown"
 #endif
 
+#define UNUSED(x)				((void)(x))
+
 void print_version(void);
 
 #endif /* _MAIN_H_ */

@@ -21,31 +21,12 @@
 
 int main(int argc, char *argv[])
 {
-	int i;
+	UNUSED(argc);
+	UNUSED(argv);
 
 	print_version();
-
-	if (argc == 1) {
-		interactive = 1;
-		if (calc_file("<stdin>", stdin))
-			return 1;
-	} else {
-		interactive = 0;
-		for (i = 1; i < argc; i++) {
-			FILE *fh;
-
-			fh = fopen(argv[i], "r");
-			if (!fh) {
-				fprintf(stderr, "%s: %s: unable to open: %s\n",
-					argv[0], argv[i], strerror(errno));
-				return 1;
-			}
-			if (calc_file(argv[i], fh))
-				return 1;
-			if (fclose(fh))
-				abort();
-		}
-	}
+	if (calc_file("<stdin>", stdin))
+		return 1;
 	return 0;
 }
 
