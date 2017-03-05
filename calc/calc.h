@@ -16,11 +16,6 @@
 
 #include <stdio.h>
 
-struct file_location {
-	unsigned int first_line, first_column;
-	unsigned int last_line, last_column;
-};
-
 /*
  * Read and parse through the given file,
  * evaluating the expression it comes across.
@@ -30,9 +25,9 @@ int calc_file(const char *fn, FILE *fh);
 void print_result(double num);
 
 /* Externals */
-extern struct file_location yy_location;
 extern const char *yyin_filename;
 extern FILE *yyin;
+extern int interactive;
 
 #endif /* _CALC_H_ */
 

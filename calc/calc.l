@@ -26,12 +26,6 @@
 #include "main.h"
 
 static double parse_num(const char *str);
-
-#define YY_USER_ACTION                                  \
-    yy_location.first_line = yylineno;                  \
-    yy_location.last_line = yylineno;                   \
-    yy_location.first_column = yy_location.last_column; \
-    yy_location.last_column += yyleng;
 %}
 
 %option stack yylineno
@@ -122,20 +116,9 @@ int yywrap(void)
 
 void yyerror(const char *message)
 {
-    if (yy_location.first_column >= 0) {
-        size_t i, off, len;
-
-        off = yy_location.first_column;
-        len = yy_location.last_column - yy_location.first_column - 1;
-        for (i = 0; i < off; i++)
-            putc(' ', stderr);
-        for (i = 0; i < len; i++)
-            putc('~', stderr);
-        fputs("^\n", stderr);
-    }
     fprintf(stderr, "%s: %s:%d: %s\n",
         PROGRAM_NAME,
         yyin_filename,
-        yy_location.first_line,
+        yylineno,
         message);
 }
