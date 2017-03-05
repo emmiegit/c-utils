@@ -37,13 +37,16 @@ int yydebug = 1;
 
 /* Precedence order */
 %nonassoc '\n' NUMBER EXIT
-%left '+' '-' '*' '/' '^' FLOORDIV LSHIFT RSHIFT
+%left '+' '-' '*' '/' '^' FLOORDIV LSHIFT RSHIFT AND OR XOR
 %left ','
 %left '(' ')' '[' ']' '{' '}'
 %nonassoc ABS ACOS ASIN ATAN ATANH CBRT CEIL COS COSH DIM EXP EXP2 FLOOR GAMMA LOG LOG10 LOG2 LOGB MAX MIN MOD RINT ROUND RT SIN SINH SQRT TAN TANH TRUNC
 
 /* Tokens */
 %token NUMBER
+%token AND
+%token OR
+%token XOR
 %token FLOORDIV
 %token LSHIFT
 %token RSHIFT
@@ -95,6 +98,7 @@ expr
         : NUMBER                        { $$ = $1; }
         | '+' expr %prec NUMBER         { $$ = +$2; }
         | '-' expr %prec NUMBER         { $$ = -$2; }
+        | '~' expr %prec NUMBER         { $$ = ~(long)$2; }
         | '(' expr ')'                  { $$ = $2; }
         | '[' expr ']'                  { $$ = $2; }
         | '{' expr '}'                  { $$ = $2; }
@@ -107,6 +111,9 @@ expr
         | expr FLOORDIV expr            { $$ = floor($1 / $3); }
         | expr LSHIFT expr              { $$ = (long)$1 << (long)$3; }
         | expr RSHIFT expr              { $$ = (long)$1 >> (long)$3; }
+        | expr AND expr                 { $$ = (long)$1 & (long)$3; }
+        | expr OR expr                  { $$ = (long)$1 | (long)$3; }
+        | expr XOR expr                 { $$ = (long)$1 ^ (long)$3; }
         | ABS expr                      { $$ = fabs($2); }
         | ACOS expr                     { $$ = acos($2); }
         | ASIN expr                     { $$ = asin($2); }

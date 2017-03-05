@@ -37,7 +37,7 @@ static double parse_num(const char *str);
 %option stack yylineno
 
 EXIT            ([qQ]([uU][iI][tT])?|[eE][xX][iI][tT])
-NUM             ([0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)
+NUM             ([0-9]+\.?[0-9]*([eE][-+]?[0-9]+)?)
 HEX             (0[xX][0-9a-fA-F]+)
 INF             ([iI][nN][fF]([iI][nN][iI][tT][yY])?)
 LOG             ([lL][oO][gG])
@@ -60,6 +60,10 @@ LN              ([lL][nN])
 ("^"|"**")      { return '^'; }
 "<<"            { return LSHIFT; }
 ">>"            { return RSHIFT; }
+("~"|"not")     { return '~'; }
+("&"|"and")     { return AND; }
+("|"|"or")      { return OR; }
+("^^"|"xor")    { return XOR; }
 "("             { return '('; }
 ")"             { return ')'; }
 "["             { return '['; }
