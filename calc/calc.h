@@ -20,7 +20,13 @@
  */
 void execute_file(void);
 
+struct location {
+	unsigned int line;
+	unsigned int first_column, last_column;
+};
+
 /* Externals */
+extern struct location yy_location;
 extern double result;
 extern double last;
 extern int done;

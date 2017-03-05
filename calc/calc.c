@@ -20,6 +20,7 @@
 #include "input.h"
 
 /* Externals */
+struct location yy_location;
 double result;
 double last;
 int done;

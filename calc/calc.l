@@ -23,9 +23,15 @@
 #include "y.tab.h"
 
 #include "calc.h"
+#include "input.h"
 #include "main.h"
 
 static double parse_num(const char *str);
+
+#define YY_USER_ACTION                                   \
+    yy_location.line = yylineno;                         \
+    yy_location.first_column = yy_location.last_column;  \
+    yy_location.last_column += yyleng;
 %}
 
 %option stack yylineno
@@ -115,12 +121,13 @@ static double parse_num(const char *str)
 
 void lex_new(const char *str)
 {
-	yy_scan_string(str);
+    yy_location.last_column = 0;
+    yy_scan_string(str);
 }
 
 void lex_del(void)
 {
-	yy_delete_buffer(YY_CURRENT_BUFFER);
+    yy_delete_buffer(YY_CURRENT_BUFFER);
 }
 
 int yywrap(void)
@@ -130,8 +137,14 @@ int yywrap(void)
 
 void yyerror(const char *message)
 {
+    size_t i, len;
+
+    len = yy_location.first_column + prompt_len;
+    for (i = 0; i < len; i++)
+        putc(' ', stderr);
+    fputs("^\n", stderr);
     fprintf(stderr, "%s: line %d: %s\n",
-        PROGRAM_NAME,
-        yylineno,
-        message);
+            PROGRAM_NAME,
+            yylineno,
+            message);
 }

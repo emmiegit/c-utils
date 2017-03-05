@@ -12,12 +12,14 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 
 #include "input.h"
 
+size_t prompt_len;
+
 #if defined(USE_READLINE)
 
-#include <stdio.h>
 #include <stdlib.h>
 
 #include <readline/readline.h>
@@ -32,6 +34,7 @@ const char *get_line(const char *prompt)
 {
 	static char *line;
 
+	prompt_len = strlen(prompt);
 	if (line)
 		free(line);
 	line = readline(prompt);
@@ -50,6 +53,7 @@ const char *get_line(const char *prompt)
 {
 	static char line[4096];
 
+	prompt_len = strlen(prompt);
 	fputs(prompt, stdout);
 	return fgets(line, sizeof(line), stdin);
 }

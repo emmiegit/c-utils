@@ -17,5 +17,7 @@
 void input_init(void);
 const char *get_line(const char *prompt);
 
+extern size_t prompt_len;
+
 #endif /* _INPUT_H_ */
 
