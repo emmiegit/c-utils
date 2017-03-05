@@ -30,6 +30,7 @@ static double parse_num(const char *str);
 
 %option stack yylineno
 
+EXIT            ([qQ]([uU][iI][tT])?|[eE][xX][iI][tT])
 NUM             ([0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)
 HEX             (0[xX][0-9a-fA-F]+)
 INF             ([iI][nN][fF]([iI][nN][iI][tT][yY])?)
@@ -39,6 +40,7 @@ LN              ([lL][nN])
 %%
 #.*$            /* ignore comments */
 [ \t\r]+        /* ignore whitespace */
+{EXIT}          { return EXIT; }
 ({NUM}|{HEX})   { yylval.num = parse_num(yytext); return NUMBER; }
 {INF}           { yylval.num = INFINITY; return NUMBER; }
 [pP][iI]        { yylval.num = M_PI; return NUMBER; }
@@ -68,7 +70,6 @@ LN              ([lL][nN])
 "cos"           { return COS; }
 "cosh"          { return COSH; }
 "dim"           { return DIM; }
-("exit"|"quit") { return EXIT; }
 "exp"           { return EXP; }
 "exp2"          { return EXP2; }
 "floor"         { return FLOOR; }

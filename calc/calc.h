@@ -28,6 +28,7 @@ void print_result(double num);
 extern const char *yyin_filename;
 extern FILE *yyin;
 extern int interactive;
+extern int done;
 
 #endif /* _CALC_H_ */
 

@@ -89,7 +89,7 @@ top
 line
         : '\n'                          /* do nothing */
         | expr '\n'                     { print_result($1); }
-        | EXIT '\n'                     { YYACCEPT; }
+        | EXIT '\n'                     { done = 1; YYACCEPT; }
         ;
 
 expr

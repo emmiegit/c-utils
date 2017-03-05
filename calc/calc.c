@@ -18,13 +18,15 @@
 /* Externals */
 const char *yyin_filename;
 int interactive;
+int done;
 
 int calc_file(const char *fn, FILE *fh)
 {
 	yyin_filename = fn;
 	yyin = fh;
 
-	while (!feof(fh)) {
+	done = 0;
+	while (!done) {
 		if (yyparse()) {
 			if (!interactive)
 				return 1;
