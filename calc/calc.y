@@ -58,6 +58,12 @@ int yydebug = 1;
         result.answer = (x);        \
     } while (0)
 
+#define FINISH_LIST_VARS()          \
+    do {                            \
+        result.has_ans = 0;         \
+        var_list();                 \
+    } while (0)
+
 #define FINISH_VARIABLE(v, x)       \
     do {                            \
         result.has_ans = 0;         \
@@ -73,7 +79,7 @@ int yydebug = 1;
 }
 
 /* Precedence order */
-%nonassoc '~' NUMBER VARIABLE EXIT
+%nonassoc '~' NUMBER VARIABLE LIST_VARS EXIT
 %left '+' '-' '*' '/' '^' FLOORDIV LSHIFT RSHIFT AND OR XOR
 %left ','
 %left '(' ')' '[' ']' '{' '}'
@@ -81,7 +87,9 @@ int yydebug = 1;
 
 /* Tokens */
 %token NUMBER
-%token OPTION
+%token VARIABLE
+%token LIST_VARS
+%token EXIT
 %token AND
 %token OR
 %token XOR
@@ -98,7 +106,6 @@ int yydebug = 1;
 %token COS
 %token COSH
 %token DIM
-%token EXIT
 %token EXP
 %token EXP2
 %token FLOOR
@@ -131,6 +138,7 @@ int yydebug = 1;
 top
         : expr                          { FINISH_ANSWER($1); }
         | VARIABLE '=' expr             { FINISH_VARIABLE($1, $3); }
+        | LIST_VARS                     { FINISH_LIST_VARS(); }
         | EXIT                          { FINISH(); YYABORT; }
         ;
 

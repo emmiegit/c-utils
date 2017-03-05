@@ -18,6 +18,7 @@
 
 int var_set(const struct str *var, double val);
 int var_get(const struct str *var, double *val);
+void var_list(void);
 
 #endif /* _VARIABLES_H_ */
 

@@ -137,3 +137,20 @@ int var_get(const struct str *var, double *val)
 	fputs("'\n", stderr);
 	return -1;
 }
+
+void var_list(void)
+{
+	size_t i;
+
+	for (i = 0; i < ARRAY_SIZE(table.entries); i++) {
+		const struct entry *ent;
+
+		/*
+		 * We don't used GET_ENTRY() because
+		 * there's no need to roll over indices.
+		 */
+		ent = &table.entries[i];
+		if (ent->key)
+			printf("%s -> %f\n", ent->key, ent->value);
+	}
+}

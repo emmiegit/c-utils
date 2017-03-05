@@ -49,11 +49,13 @@ INF             ([iI][nN][fF]([iI][nN][iI][tT][yY])?)
 NAN             ([nN][aA][nN])
 LOG             ([lL][oO][gG])
 LN              ([lL][nN])
-VAR             ([A-Za-z][A-Za-z0-9]*)
+VAR             ([A-Za-z_][A-Za-z_0-9]*)
+VARS            ([vV][aA][rR][sS])
 
 %%
 [ \t\r\n]+      /* ignore whitespace */
 {EXIT}          { return EXIT; }
+{VARS}          { return LIST_VARS; }
 ({NUM}|{HEX})   { yylval.val = parse_num(yytext); return NUMBER; }
 {INF}           { yylval.val = INFINITY; return NUMBER; }
 {NAN}           { yylval.val = NAN; return NUMBER; }
