@@ -14,15 +14,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <readline/readline.h>
-#include <readline/history.h>
-
 #include "y.tab.h"
 
 #include "calc.h"
+#include "input.h"
 
 /* Externals */
-const char *yyin_filename;
 double result;
 double last;
 int done;
@@ -39,35 +36,22 @@ static void print_result(double num)
 		printf("= %f\n", num);
 }
 
-static const char *get_line(const char *prompt)
+void execute_file(void)
 {
-	static char *line;
-
-	if (line)
-		free(line);
-	line = readline(prompt);
-	if (line && line[0])
-		add_history(line);
-	return line;
-}
-
-void execute_file(const char *fn)
-{
-	yyin_filename = fn;
-
 	/* Setup */
 	done = 0;
 	last = 0.0;
-	rl_editing_mode = 0;
 
 	while (!done) {
 		const char *line;
 
 		line = get_line("> ");
-		if (!line)
+		if (!line) {
+			putchar('\n');
 			return;
-		else if (!line[0])
+		} else if (!line[0] || line[0] == '\n') {
 			continue;
+		}
 
 		lex_new(line);
 		if (!yyparse())

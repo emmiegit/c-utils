@@ -52,6 +52,8 @@ LN              ([lL][nN])
 "//"            { return FLOORDIV; }
 ("%"|"mod")     { return MOD; }
 ("^"|"**")      { return '^'; }
+"<<"            { return LSHIFT; }
+">>"            { return RSHIFT; }
 "("             { return '('; }
 ")"             { return ')'; }
 "["             { return '['; }
@@ -102,7 +104,7 @@ static double parse_num(const char *str)
     if (errno) {
         fprintf(stderr,
             "%s: unable to parse number: %s\n",
-            yyin_filename,
+            PROGRAM_NAME,
             strerror(errno));
         return NAN;
     }
@@ -128,9 +130,8 @@ int yywrap(void)
 
 void yyerror(const char *message)
 {
-    fprintf(stderr, "%s: %s:%d: %s\n",
+    fprintf(stderr, "%s: line %d: %s\n",
         PROGRAM_NAME,
-        yyin_filename,
         yylineno,
         message);
 }

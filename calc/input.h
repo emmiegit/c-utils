@@ -1,5 +1,5 @@
 /*
- * calc.h
+ * input.h
  *
  * calc - a simple CLI calculator
  * Copyright (c) 2017 Ammon Smith
@@ -11,19 +11,11 @@
  *
  */
 
-#ifndef _CALC_H_
-#define _CALC_H_
+#ifndef _INPUT_H_
+#define _INPUT_H_
 
-/*
- * Read and parse through the given file,
- * evaluating the expression it comes across.
- */
-void execute_file(void);
+void input_init(void);
+const char *get_line(const char *prompt);
 
-/* Externals */
-extern double result;
-extern double last;
-extern int done;
-
-#endif /* _CALC_H_ */
+#endif /* _INPUT_H_ */
 

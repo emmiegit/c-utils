@@ -21,11 +21,15 @@
 
 int main(int argc, char *argv[])
 {
-	UNUSED(argc);
 	UNUSED(argv);
 
+	if (argc != 1) {
+		fprintf(stderr, "%s: warn: ignoring arguments\n",
+			argv[0]);
+	}
+
 	print_version();
-	execute_file("stdin");
+	execute_file();
 	return 0;
 }
 

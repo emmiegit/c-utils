@@ -13,6 +13,7 @@
 .SUFFIXES:
 
 V          ?= 0
+READLINE   ?= 1
 
 ECHO_CC_0   = @echo '[CC]  $@'; $(CC)
 ECHO_CC_1   = $(CC)
@@ -47,9 +48,14 @@ FLAGS      := -pipe
 WARN_FLAGS := -ansi -pedantic -Wall -Wextra -Wshadow -Wmissing-prototypes
 DEFN_FLAGS := -DGIT_HASH='"$(shell git rev-parse --short HEAD)"'
 COMP_FLAGS := -O2 -I.
-LINK_FLAGS := -lm -lreadline
+LINK_FLAGS := -lm
 YACC_FLAGS :=
 LEX_FLAGS  := -f
+
+ifeq ($(READLINE),1)
+DEFN_FLAGS += -DUSE_READLINE
+LINK_FLAGS += -lreadline
+endif
 
 .PHONY: all
 all:

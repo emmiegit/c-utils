@@ -37,7 +37,7 @@ int yydebug = 1;
 
 /* Precedence order */
 %nonassoc '\n' NUMBER EXIT
-%left '+' '-' '*' '/' '^' FLOORDIV
+%left '+' '-' '*' '/' '^' FLOORDIV LSHIFT RSHIFT
 %left ','
 %left '(' ')' '[' ']' '{' '}'
 %nonassoc ABS ACOS ASIN ATAN ATANH CBRT CEIL COS COSH DIM EXP EXP2 FLOOR GAMMA LOG LOG10 LOG2 LOGB MAX MIN MOD RINT ROUND RT SIN SINH SQRT TAN TANH TRUNC
@@ -45,6 +45,8 @@ int yydebug = 1;
 /* Tokens */
 %token NUMBER
 %token FLOORDIV
+%token LSHIFT
+%token RSHIFT
 %token ABS
 %token ACOS
 %token ASIN
@@ -103,6 +105,8 @@ expr
         | expr '^' expr                 { $$ = pow($1, $3); }
         | expr MOD expr                 { $$ = fmod($1, $3); }
         | expr FLOORDIV expr            { $$ = floor($1 / $3); }
+        | expr LSHIFT expr              { $$ = (long)$1 << (long)$3; }
+        | expr RSHIFT expr              { $$ = (long)$1 >> (long)$3; }
         | ABS expr                      { $$ = fabs($2); }
         | ACOS expr                     { $$ = acos($2); }
         | ASIN expr                     { $$ = asin($2); }
