@@ -38,12 +38,16 @@ static double parse_num(const char *str);
 NUM             ([0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)
 HEX             (0[xX][0-9a-fA-F]+)
 INF             ([iI][nN][fF]([iI][nN][iI][tT][yY])?)
+LOG             ([lL][oO][gG])
+LN              ([lL][nN])
 
 %%
 #.*$            /* ignore comments */
 [ \t\r]+        /* ignore whitespace */
 ({NUM}|{HEX})   { yylval.num = parse_num(yytext); return NUMBER; }
 {INF}           { yylval.num = INFINITY; return NUMBER; }
+[pP][iI]        { yylval.num = M_PI; return NUMBER; }
+[eE]            { yylval.num = M_E; return NUMBER; }
 \n              { return '\n'; }
 "+"             { return '+'; }
 "-"             { return '-'; }
@@ -59,8 +63,6 @@ INF             ([iI][nN][fF]([iI][nN][iI][tT][yY])?)
 "{"             { return '{'; }
 "}"             { return '}'; }
 ","             { return ','; }
-[pP][iI]        { yylval.num = M_PI; return NUMBER; }
-[eE]            { yylval.num = M_E; return NUMBER; }
 "abs"           { return ABS; }
 "acos"          { return ACOS; }
 "asin"          { return ASIN; }
