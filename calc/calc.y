@@ -18,6 +18,7 @@
 #include <stdio.h>
 
 #include "calc.h"
+#include "main.h"
 #include "variables.h"
 
 extern int yylex(void);
@@ -46,22 +47,21 @@ int yydebug = 1;
             YYABORT;                \
     } while (0)
 
+#define TERMINATE()                 \
+    do {                            \
+        result.running = 0;         \
+        YYABORT;                    \
+    } while (0)
+
 #define FINISH()                    \
     do {                            \
         result.has_ans = 0;         \
-        result.running = 0;         \
     } while (0)
 
 #define FINISH_ANSWER(x)            \
     do {                            \
         result.has_ans = 1;         \
         result.answer = (x);        \
-    } while (0)
-
-#define FINISH_LIST_VARS()          \
-    do {                            \
-        result.has_ans = 0;         \
-        var_list();                 \
     } while (0)
 
 #define FINISH_VARIABLE(v, x)       \
@@ -89,6 +89,7 @@ int yydebug = 1;
 %token NUMBER
 %token VARIABLE
 %token LIST_VARS
+%token HELP
 %token EXIT
 %token AND
 %token OR
@@ -138,8 +139,9 @@ int yydebug = 1;
 top
         : expr                          { FINISH_ANSWER($1); }
         | VARIABLE '=' expr             { FINISH_VARIABLE($1, $3); }
-        | LIST_VARS                     { FINISH_LIST_VARS(); }
-        | EXIT                          { FINISH(); YYABORT; }
+        | LIST_VARS                     { FINISH(); var_list(); }
+        | HELP                          { FINISH(); print_help(); }
+        | EXIT                          { FINISH(); TERMINATE(); }
         ;
 
 expr

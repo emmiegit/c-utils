@@ -42,7 +42,6 @@ static double parse_num(const char *str);
 
 %option stack yylineno
 
-EXIT            ([qQ]([uU][iI][tT])?|[eE][xX][iI][tT])
 NUM             ([0-9]+\.?[0-9]*([eE][-+]?[0-9]+)?)
 HEX             (0[xX][0-9a-fA-F]+)
 INF             ([iI][nN][fF]([iI][nN][iI][tT][yY])?)
@@ -50,12 +49,15 @@ NAN             ([nN][aA][nN])
 LOG             ([lL][oO][gG])
 LN              ([lL][nN])
 VAR             ([A-Za-z_][A-Za-z_0-9]*)
+EXIT            ([qQ]([uU][iI][tT])?|[eE][xX][iI][tT])
 VARS            ([vV][aA][rR][sS])
+HELP            ([hH][eE][lL][pP])
 
 %%
 [ \t\r\n]+      /* ignore whitespace */
 {EXIT}          { return EXIT; }
 {VARS}          { return LIST_VARS; }
+{HELP}          { return HELP; }
 ({NUM}|{HEX})   { yylval.val = parse_num(yytext); return NUMBER; }
 {INF}           { yylval.val = INFINITY; return NUMBER; }
 {NAN}           { yylval.val = NAN; return NUMBER; }

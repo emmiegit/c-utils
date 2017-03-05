@@ -50,3 +50,23 @@ void print_version(void)
 		__DATE__,
 		__TIME__);
 }
+
+void print_help(void)
+{
+	puts("Grammar constructs:\n"
+	     " [constant|variable]\n"
+	     " [+|-|~] expression\n"
+	     " expression [+|-|*|/|//|^|%|<<|>>|and|or|xor] expression\n"
+	     " ( expression )\n"
+	     " [ expression ]\n"
+	     " { expression }\n"
+	     " function [(] arg1, arg2, ... [)]\n"
+	     "\n"
+	     "Available constants: (case-insensitive)\n"
+	     " pi, e, inf, nan\n"
+	     "\n"
+	     "Available functions:\n"
+	     " abs, acos, asin, atan, atanh, cbrt, ceil, cos, cosh, dim, exp,\n"
+	     " exp2, floor, gamma, log, log10, log2, logb, ln, max, min, rint,\n"
+	     " rt, round, sin, sinh, sqrt, tan, tanh, trunc\n");
+}

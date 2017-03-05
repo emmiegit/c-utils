@@ -17,7 +17,7 @@
 #define PROGRAM_NAME				"calc"
 #define PROGRAM_VERSION_MAJOR			0
 #define PROGRAM_VERSION_MINOR			4
-#define PROGRAM_VERSION_PATCH			3
+#define PROGRAM_VERSION_PATCH			4
 
 #ifndef GIT_HASH
 # define GIT_HASH                               "nogithash"
@@ -76,6 +76,7 @@
 #define ARRAY_SIZE(x)				((sizeof(x)) / (sizeof((x)[0])))
 
 void print_version(void);
+void print_help(void);
 
 #endif /* _MAIN_H_ */
 
