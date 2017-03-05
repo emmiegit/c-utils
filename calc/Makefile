@@ -10,6 +10,8 @@
 # WITHOUT ANY WARRANTY. See the LICENSE file for more details.
 #
 
+.SUFFIXES:
+
 V          ?= 0
 
 ECHO_CC_0   = @echo '[CC] $@'; $(CC)
@@ -46,6 +48,8 @@ WARN_FLAGS := -ansi -pedantic -Wall -Wextra -Wshadow -Wmissing-prototypes
 DEFN_FLAGS :=
 COMP_FLAGS := -O2 -I.
 LINK_FLAGS := -lm
+YACC_FLAGS :=
+LEX_FLAGS  := -f
 
 .PHONY: all
 all:
@@ -64,12 +68,6 @@ release: $(TARGET)
 clean:
 	rm -f *.o *.d y.tab.? lex.yy.? $(TARGET)
 
-%.d: %.c
-	$(ECHO_DEP) $(FLAGS) $(CFLAGS) $(COMP_FLAGS) $(DEFN_FLAGS) -MM $< > $@
-
-%.o: %.c
-	$(ECHO_CC) $(FLAGS) $(CFLAGS) $(WARN_FLAGS) $(COMP_FLAGS) $(DEFN_FLAGS) -c -o $@ $<
-
 y.tab.c y.tab.h: calc.y
 	$(ECHO_YAC) $(YACC_FLAGS) $(YFLAGS) -d $<
 
@@ -79,7 +77,13 @@ y.tab.o: y.tab.c
 lex.yy.c: calc.l y.tab.h
 	$(ECHO_LEX) $(FLEX_FLAGS) $(LFLAGS) $<
 
-$(TARGET): $(OBJECTS)
+%.d: %.c y.tab.h
+	$(ECHO_DEP) $(FLAGS) $(CFLAGS) $(COMP_FLAGS) $(DEFN_FLAGS) -MM $< > $@
+
+%.o: %.c
+	$(ECHO_CC) $(FLAGS) $(CFLAGS) $(WARN_FLAGS) $(COMP_FLAGS) $(DEFN_FLAGS) -c -o $@ $<
+
+$(TARGET): $(OBJECTS) lex.yy.o y.tab.o
 	$(ECHO_LD) $(FLAGS) $(CFLAGS) $(LINK_FLAGS) -o $@ $^
 
 -include $(DEPENDS)

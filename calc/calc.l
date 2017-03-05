@@ -26,9 +26,15 @@
 #include "main.h"
 
 static double parse_num(const char *str);
+
+#define YY_USER_ACTION                                  \
+    y_location.first_line = yylineno;                   \
+    y_location.last_line = yylineno;                    \
+    y_location.first_column = y_location.last_column;   \
+    y_location.last_column += yyleng;
 %}
 
-%option stack yylineno noyywrap
+%option stack yylineno
 
 NUM             ([0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)
 HEX             (0[xX][0-9a-fA-F]+)
@@ -84,6 +90,11 @@ static double parse_num(const char *str)
     if (*ptr || isnan(result))
         abort();
     return result;
+}
+
+int yywrap(void)
+{
+    return 1;
 }
 
 void yyerror(const char *message)
