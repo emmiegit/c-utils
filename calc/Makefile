@@ -62,11 +62,11 @@ all:
 all: $(TARGET)
 
 .PHONY: debug
-debug: CFLAGS='-g'
+debug: CFLAGS = -g
 debug: $(TARGET)
 
 .PHONY: release
-release: CFLAGS='-Werror -fstack-protector-strong -DNDEBUG'
+release: CFLAGS = -Werror -fstack-protector-strong -DNDEBUG
 release: $(TARGET)
 	$(ECHO_STR) $<
 
