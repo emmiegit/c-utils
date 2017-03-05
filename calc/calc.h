@@ -31,6 +31,7 @@ int calc_file(const char *fn, FILE *fh);
 extern struct file_location y_location;
 extern int interactive;
 extern const char *yyin_filename;
+extern FILE *yyin;
 
 #endif /* _CALC_H_ */
 

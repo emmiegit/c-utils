@@ -17,7 +17,6 @@
 #include <math.h>
 #include <stdio.h>
 
-extern FILE *yyin;
 extern int yylex(void);
 extern int yyparse(void);
 extern void yyerror(const char *);
@@ -35,6 +34,7 @@ int yydebug = 1;
 }
 
 /* Precedence order */
+%nonassoc ABS ACOS ASIN ATAN ATANH CBRT CEIL COS COSH EXP EXP2 FLOOR
 %left '+' '-' '*' '/' '^' FLOORDIV
 %left '(' ')' '[' ']' '{' '}'
 

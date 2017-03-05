@@ -77,6 +77,9 @@ y.tab.o: y.tab.c
 lex.yy.c: calc.l y.tab.h
 	$(ECHO_LEX) $(FLEX_FLAGS) $(LFLAGS) $<
 
+lex.yy.o: lex.yy.c
+	$(ECHO_CC) $(FLAGS) $(CFLAGS) $(COMP_FLAGS) $(DEFN_FLAGS) -c -o $@ $<
+
 %.d: %.c y.tab.h
 	$(ECHO_DEP) $(FLAGS) $(CFLAGS) $(COMP_FLAGS) $(DEFN_FLAGS) -MM $< > $@
 

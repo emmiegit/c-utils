@@ -17,6 +17,7 @@
 
 /* Externals */
 struct file_location y_location;
+const char *yyin_filename;
 int interactive;
 
 int calc_file(const char *fn, FILE *fh)

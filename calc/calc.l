@@ -23,7 +23,6 @@
 #include "y.tab.h"
 
 #include "calc.h"
-#include "main.h"
 
 static double parse_num(const char *str);
 
@@ -110,5 +109,8 @@ void yyerror(const char *message)
             putc('~', stderr);
         fputs("^\n", stderr);
     }
-    fprintf(stderr, "%s: %s\n", PROGRAM_NAME, message);
+    fprintf(stderr, "%s:%d: %s\n",
+        yyin_filename,
+        y_location.first_line,
+        message);
 }
