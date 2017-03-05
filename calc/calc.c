@@ -55,13 +55,19 @@ void execute_file(const char *fn)
 {
 	yyin_filename = fn;
 
+	/* Setup */
 	done = 0;
+	last = 0.0;
+	rl_editing_mode = 0;
+
 	while (!done) {
 		const char *line;
 
 		line = get_line("> ");
 		if (!line)
 			return;
+		else if (!line[0])
+			continue;
 
 		lex_new(line);
 		if (!yyparse())

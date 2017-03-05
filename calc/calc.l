@@ -113,7 +113,6 @@ static double parse_num(const char *str)
 
 void lex_new(const char *str)
 {
-	last = 0.0;
 	yy_scan_string(str);
 }
 

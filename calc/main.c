@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
 	UNUSED(argv);
 
 	print_version();
-	execute_file("<stdin>");
+	execute_file("stdin");
 	return 0;
 }
 

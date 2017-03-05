@@ -85,7 +85,7 @@ int yydebug = 1;
 
 %%
 top
-        : expr                          { last = $1; }
+        : expr                          { result = $1; }
         | EXIT                          { done = 1; YYABORT; }
         ;
 
