@@ -64,7 +64,13 @@ int yydebug = 1;
 
 %%
 top
-        : expr                          { result = $1; }
+        : line
+        | top line
+        ;
+
+line
+        : '\n'                          /* do nothing */
+        | expr '\n'                     { print_result($1); }
         ;
 
 expr

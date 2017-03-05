@@ -19,9 +19,6 @@
 struct file_location yy_location;
 const char *yyin_filename;
 
-int interactive;
-double result;
-
 int calc_file(const char *fn, FILE *fh)
 {
 	yyin_filename = fn;
@@ -29,6 +26,13 @@ int calc_file(const char *fn, FILE *fh)
 
 	if (yyparse())
 		return 1;
-	printf("= %f\n", result);
 	return 0;
+}
+
+void print_result(double num)
+{
+	if (num == (long)num)
+		printf("= %ld\n", (long)num);
+	else
+		printf("= %f\n", num);
 }

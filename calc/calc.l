@@ -41,9 +41,10 @@ INF             ([iI][nN][fF]([iI][nN][iI][tT][yY])?)
 
 %%
 #.*$            /* ignore comments */
-[ \t\r\n]+      /* ignore whitespace */
+[ \t\r]+        /* ignore whitespace */
 ({NUM}|{HEX})   { yylval.num = parse_num(yytext); return NUMBER; }
 {INF}           { yylval.num = INFINITY; return NUMBER; }
+\n              { return '\n'; }
 "+"             { return '+'; }
 "-"             { return '-'; }
 "*"             { return '*'; }
@@ -98,7 +99,7 @@ int yywrap(void)
 
 void yyerror(const char *message)
 {
-    if (yy_location.first_column >= 0 && interactive) {
+    if (yy_location.first_column >= 0) {
         size_t i, off, len;
 
         off = yy_location.first_column;
@@ -109,7 +110,8 @@ void yyerror(const char *message)
             putc('~', stderr);
         fputs("^\n", stderr);
     }
-    fprintf(stderr, "%s:%d: %s\n",
+    fprintf(stderr, "%s: %s:%d: %s\n",
+        PROGRAM_NAME,
         yyin_filename,
         yy_location.first_line,
         message);

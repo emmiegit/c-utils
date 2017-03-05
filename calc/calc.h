@@ -17,9 +17,14 @@
 #include <stdio.h>
 
 struct file_location {
-    unsigned int first_line, first_column;
-    unsigned int last_line, last_column;
+	unsigned int first_line, first_column;
+	unsigned int last_line, last_column;
 };
+
+#define PROGRAM_NAME		"calc"
+#define PROGRAM_VERSION_MAJOR	0
+#define PROGRAM_VERSION_MINOR	0
+#define PROGRAM_VERSION_PATCH	1
 
 /*
  * Read and parse through the given file,
@@ -27,10 +32,12 @@ struct file_location {
  */
 int calc_file(const char *fn, FILE *fh);
 
-/* Externals */
-extern int interactive;
-extern double result;
+/*
+ * Print the result of the given computation.
+ */
+void print_result(double num);
 
+/* Externals */
 extern struct file_location yy_location;
 extern const char *yyin_filename;
 extern FILE *yyin;
