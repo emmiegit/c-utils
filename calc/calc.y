@@ -60,7 +60,7 @@ int yydebug = 1;
 }
 
 /* Precedence order */
-%nonassoc NUMBER OPTION EXIT
+%nonassoc '~' NUMBER OPTION EXIT
 %left '+' '-' '*' '/' '^' FLOORDIV LSHIFT RSHIFT AND OR XOR
 %left ','
 %left '(' ')' '[' ']' '{' '}'
