@@ -60,6 +60,7 @@ LN              ([lL][nN])
 "{"             { return '{'; }
 "}"             { return '}'; }
 ","             { return ','; }
+"_"             { yylval.num = last; return NUMBER; }
 "abs"           { return ABS; }
 "acos"          { return ACOS; }
 "asin"          { return ASIN; }

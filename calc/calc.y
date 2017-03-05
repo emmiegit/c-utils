@@ -82,13 +82,14 @@ int yydebug = 1;
 
 %%
 top
-        : line
+        : /* empty */                   { done = 1; }
+        | line
         | top line
         ;
 
 line
         : '\n'                          /* do nothing */
-        | expr '\n'                     { print_result($1); }
+        | expr '\n'                     { last = $1; print_result($1); }
         | EXIT '\n'                     { done = 1; YYACCEPT; }
         ;
 

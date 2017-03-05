@@ -17,6 +17,7 @@
 
 /* Externals */
 const char *yyin_filename;
+double last;
 int done;
 
 int calc_file(const char *fn, FILE *fh)
@@ -24,6 +25,7 @@ int calc_file(const char *fn, FILE *fh)
 	yyin_filename = fn;
 	yyin = fh;
 
+	last = 0;
 	done = 0;
 	while (!done)
 		yyparse();
