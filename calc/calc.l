@@ -58,6 +58,7 @@ INF             ([iI][nN][fF]([iI][nN][iI][tT][yY])?)
 "{"             { return '{'; }
 "}"             { return '}'; }
 [pP][iI]        { yylval.num = M_PI; return NUMBER; }
+[eE]            { yylval.num = M_E; return NUMBER; }
 "abs"           { return ABS; }
 "acos"          { return ACOS; }
 "asin"          { return ASIN; }

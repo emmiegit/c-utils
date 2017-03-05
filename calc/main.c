@@ -22,7 +22,8 @@ int main(int argc, char *argv[])
 {
 	int i;
 
-	printf("calc v%d.%d.%d\n",
+	printf("%s v%d.%d.%d\n",
+		PROGRAM_NAME,
 		PROGRAM_VERSION_MAJOR,
 		PROGRAM_VERSION_MINOR,
 		PROGRAM_VERSION_PATCH);

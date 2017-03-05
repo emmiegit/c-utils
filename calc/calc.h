@@ -24,7 +24,7 @@ struct file_location {
 #define PROGRAM_NAME		"calc"
 #define PROGRAM_VERSION_MAJOR	0
 #define PROGRAM_VERSION_MINOR	0
-#define PROGRAM_VERSION_PATCH	1
+#define PROGRAM_VERSION_PATCH	2
 
 /*
  * Read and parse through the given file,
@@ -32,9 +32,6 @@ struct file_location {
  */
 int calc_file(const char *fn, FILE *fh);
 
-/*
- * Print the result of the given computation.
- */
 void print_result(double num);
 
 /* Externals */
