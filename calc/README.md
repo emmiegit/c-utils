@@ -9,5 +9,6 @@ Available under the MIT License.
 * ANSI C compiler
 * yacc-compatible parser generator
 * lex-compatible lexer generator
+* GNU readline
 * GNU Make
 

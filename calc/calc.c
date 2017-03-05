@@ -11,31 +11,61 @@
  *
  */
 
+#include <stdlib.h>
+#include <stdio.h>
+
+#include <readline/readline.h>
+#include <readline/history.h>
+
 #include "y.tab.h"
 
 #include "calc.h"
 
 /* Externals */
 const char *yyin_filename;
+double result;
 double last;
 int done;
 
-int calc_file(const char *fn, FILE *fh)
-{
-	yyin_filename = fn;
-	yyin = fh;
+/* Parser utilities */
+void lex_new(const char *str);
+void lex_del(void);
 
-	last = 0;
-	done = 0;
-	while (!done)
-		yyparse();
-	return 0;
-}
-
-void print_result(double num)
+static void print_result(double num)
 {
 	if (num == (long)num)
 		printf("= %ld\n", (long)num);
 	else
 		printf("= %f\n", num);
+}
+
+static const char *get_line(const char *prompt)
+{
+	static char *line;
+
+	if (line)
+		free(line);
+	line = readline(prompt);
+	if (line && line[0])
+		add_history(line);
+	return line;
+}
+
+void execute_file(const char *fn)
+{
+	yyin_filename = fn;
+
+	done = 0;
+	while (!done) {
+		const char *line;
+
+		line = get_line("> ");
+		if (!line)
+			return;
+
+		lex_new(line);
+		if (!yyparse())
+			print_result(result);
+		lex_del();
+	}
 }

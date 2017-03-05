@@ -14,7 +14,7 @@
 
 V          ?= 0
 
-ECHO_CC_0   = @echo '[CC] $@'; $(CC)
+ECHO_CC_0   = @echo '[CC]  $@'; $(CC)
 ECHO_CC_1   = $(CC)
 ECHO_CC     = $(ECHO_CC_$(V))
 
@@ -22,7 +22,7 @@ ECHO_DEP_0  = @echo '[DEP] $@'; $(CC)
 ECHO_DEP_1  = $(CC)
 ECHO_DEP    = $(ECHO_DEP_$(V))
 
-ECHO_LD_0   = @echo '[LD] $@'; $(CC)
+ECHO_LD_0   = @echo '[LD]  $@'; $(CC)
 ECHO_LD_1   = $(CC)
 ECHO_LD     = $(ECHO_LD_$(V))
 
@@ -47,7 +47,7 @@ FLAGS      := -pipe
 WARN_FLAGS := -ansi -pedantic -Wall -Wextra -Wshadow -Wmissing-prototypes
 DEFN_FLAGS := -DGIT_HASH='"$(shell git rev-parse --short HEAD)"'
 COMP_FLAGS := -O2 -I.
-LINK_FLAGS := -lm
+LINK_FLAGS := -lm -lreadline
 YACC_FLAGS :=
 LEX_FLAGS  := -f
 

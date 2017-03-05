@@ -36,10 +36,11 @@ int yydebug = 1;
 }
 
 /* Precedence order */
+%nonassoc '\n' NUMBER EXIT
 %left '+' '-' '*' '/' '^' FLOORDIV
 %left ','
 %left '(' ')' '[' ']' '{' '}'
-%nonassoc ABS ACOS ASIN ATAN ATANH CBRT CEIL COS COSH DIM EXP EXP2 FLOOR GAMMA LOG LOG10 LOG2 LOGB MAX MIN MOD RINT ROUND SIN SINH SQRT TAN TANH TRUNC
+%nonassoc ABS ACOS ASIN ATAN ATANH CBRT CEIL COS COSH DIM EXP EXP2 FLOOR GAMMA LOG LOG10 LOG2 LOGB MAX MIN MOD RINT ROUND RT SIN SINH SQRT TAN TANH TRUNC
 
 /* Tokens */
 %token NUMBER
@@ -68,6 +69,7 @@ int yydebug = 1;
 %token MOD
 %token RINT
 %token ROUND
+%token RT
 %token SIN
 %token SINH
 %token SQRT
@@ -83,15 +85,8 @@ int yydebug = 1;
 
 %%
 top
-        : /* empty */                   { done = 1; }
-        | line
-        | top line
-        ;
-
-line
-        : '\n'                          /* do nothing */
-        | expr '\n'                     { last = $1; print_result($1); }
-        | EXIT '\n'                     { done = 1; YYACCEPT; }
+        : expr                          { last = $1; }
+        | EXIT                          { done = 1; YYABORT; }
         ;
 
 expr
@@ -129,6 +124,7 @@ expr
         | MAX expr ',' expr             { $$ = fmax($2, $4); }
         | MIN expr ',' expr             { $$ = fmin($2, $4); }
         | RINT expr                     { $$ = rint($2); }
+        | RT expr ',' expr              { $$ = pow($4, 1 / $2); }
         | ROUND expr                    { $$ = round($2); }
         | SIN expr                      { $$ = sin($2); }
         | SINH expr                     { $$ = sinh($2); }

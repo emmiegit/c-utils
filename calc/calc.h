@@ -14,19 +14,15 @@
 #ifndef _CALC_H_
 #define _CALC_H_
 
-#include <stdio.h>
-
 /*
  * Read and parse through the given file,
  * evaluating the expression it comes across.
  */
-int calc_file(const char *fn, FILE *fh);
-
-void print_result(double num);
+void execute_file(const char *fn);
 
 /* Externals */
 extern const char *yyin_filename;
-extern FILE *yyin;
+extern double result;
 extern double last;
 extern int done;
 

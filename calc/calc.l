@@ -39,13 +39,12 @@ LN              ([lL][nN])
 
 %%
 #.*$            /* ignore comments */
-[ \t\r]+        /* ignore whitespace */
+[ \t\r\n]+      /* ignore whitespace */
 {EXIT}          { return EXIT; }
 ({NUM}|{HEX})   { yylval.num = parse_num(yytext); return NUMBER; }
 {INF}           { yylval.num = INFINITY; return NUMBER; }
 [pP][iI]        { yylval.num = M_PI; return NUMBER; }
 [eE]            { yylval.num = M_E; return NUMBER; }
-\n              { return '\n'; }
 "+"             { return '+'; }
 "-"             { return '-'; }
 "*"             { return '*'; }
@@ -83,6 +82,7 @@ LN              ([lL][nN])
 "min"           { return MIN; }
 "rint"          { return RINT; }
 "round"         { return ROUND; }
+"rt"            { return RT; }
 "sin"           { return SIN; }
 "sinh"          { return SINH; }
 "sqrt"          { return SQRT; }
@@ -109,6 +109,17 @@ static double parse_num(const char *str)
     if (*ptr || isnan(result))
         abort();
     return result;
+}
+
+void lex_new(const char *str)
+{
+	last = 0.0;
+	yy_scan_string(str);
+}
+
+void lex_del(void)
+{
+	yy_delete_buffer(YY_CURRENT_BUFFER);
 }
 
 int yywrap(void)
