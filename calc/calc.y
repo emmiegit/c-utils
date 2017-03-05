@@ -17,6 +17,8 @@
 #include <math.h>
 #include <stdio.h>
 
+#include "calc.h"
+
 extern int yylex(void);
 extern int yyparse(void);
 extern void yyerror(const char *);
@@ -58,9 +60,13 @@ int yydebug = 1;
 %type<num> NUMBER
 %type<num> expr
 
-%start expr
+%start top
 
 %%
+top
+        : expr                          { result = $1; }
+        ;
+
 expr
         : NUMBER                        { $$ = $1; }
         | '+' expr %prec NUMBER         { $$ = +$2; }

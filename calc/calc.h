@@ -28,8 +28,10 @@ struct file_location {
 int calc_file(const char *fn, FILE *fh);
 
 /* Externals */
-extern struct file_location y_location;
 extern int interactive;
+extern double result;
+
+extern struct file_location yy_location;
 extern const char *yyin_filename;
 extern FILE *yyin;
 

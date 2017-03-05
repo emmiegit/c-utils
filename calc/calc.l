@@ -27,10 +27,10 @@
 static double parse_num(const char *str);
 
 #define YY_USER_ACTION                                  \
-    y_location.first_line = yylineno;                   \
-    y_location.last_line = yylineno;                    \
-    y_location.first_column = y_location.last_column;   \
-    y_location.last_column += yyleng;
+    yy_location.first_line = yylineno;                  \
+    yy_location.last_line = yylineno;                   \
+    yy_location.first_column = yy_location.last_column; \
+    yy_location.last_column += yyleng;
 %}
 
 %option stack yylineno
@@ -98,11 +98,11 @@ int yywrap(void)
 
 void yyerror(const char *message)
 {
-    if (y_location.first_column >= 0 && interactive) {
+    if (yy_location.first_column >= 0 && interactive) {
         size_t i, off, len;
 
-        off = y_location.first_column;
-        len = y_location.last_column - y_location.first_column - 1;
+        off = yy_location.first_column;
+        len = yy_location.last_column - yy_location.first_column - 1;
         for (i = 0; i < off; i++)
             putc(' ', stderr);
         for (i = 0; i < len; i++)
@@ -111,6 +111,6 @@ void yyerror(const char *message)
     }
     fprintf(stderr, "%s:%d: %s\n",
         yyin_filename,
-        y_location.first_line,
+        yy_location.first_line,
         message);
 }

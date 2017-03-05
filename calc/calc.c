@@ -16,14 +16,19 @@
 #include "calc.h"
 
 /* Externals */
-struct file_location y_location;
+struct file_location yy_location;
 const char *yyin_filename;
+
 int interactive;
+double result;
 
 int calc_file(const char *fn, FILE *fh)
 {
 	yyin_filename = fn;
 	yyin = fh;
 
+	if (yyparse())
+		return 1;
+	printf("= %f\n", result);
 	return 0;
 }
