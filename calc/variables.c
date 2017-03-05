@@ -18,15 +18,14 @@
 #include "main.h"
 #include "variables.h"
 
-#define MAX_VARIABLES   512U
+#define MAX_VARIABLES   512u
 
 #define GET_ENTRY(x)	(&(table.entries[(x) % ARRAY_SIZE(table.entries)]))
-#define KEY_EMPTY(x)	(!(x).ptr)
 
 /* Statically-sized hash table with linear probing */
 static struct {
 	struct entry {
-		struct str key;
+		char *key;
 		double value;
 	} entries[MAX_VARIABLES];
 	size_t size;
@@ -43,11 +42,32 @@ static size_t get_index(const struct str *str)
 	return hash % ARRAY_SIZE(table.entries);
 }
 
-static int strings_equal(const struct str *x, const struct str *y)
+static char *string_dup(const struct str *s)
 {
-	if (x->len != y->len)
-		return 0;
-	return !memcmp(x->ptr, y->ptr, x->len);
+	char *buf;
+
+	buf = malloc(s->len + 1);
+	if (!buf)
+		return NULL;
+	memcpy(buf, s->ptr, s->len);
+	buf[s->len] = '\0';
+	return buf;
+}
+
+static int strings_equal(const struct str *x, const char *y)
+{
+	size_t i;
+
+	for (i = 0; i < x->len; i++) {
+		/* the other string ends early */
+		if (!y[0])
+			return 0;
+
+		/* the strings are inequal */
+		if (x->ptr[0] != y[0])
+			return 0;
+	}
+	return 1;
 }
 
 static void string_put(const struct str *s, FILE *out)
@@ -73,13 +93,22 @@ int var_set(const struct str *var, double val)
 		struct entry *ent;
 
 		ent = GET_ENTRY(index + i);
-		if (KEY_EMPTY(ent->key)) {
-			memcpy(&ent->key.ptr, var, sizeof(struct str));
+		if (!ent->key) {
+			char *str;
+
+			str = string_dup(var);
+			if (!str) {
+				fprintf(stderr, "%s: unable to duplicate string\n",
+					PROGRAM_NAME);
+				return -1;
+			}
+
+			ent->key = str;
 			ent->value = val;
 			table.size++;
 			return 0;
 		}
-		if (strings_equal(var, &ent->key)) {
+		if (strings_equal(var, ent->key)) {
 			ent->value = val;
 			return 0;
 		}
@@ -96,10 +125,9 @@ int var_get(const struct str *var, double *val)
 		const struct entry *ent;
 
 		ent = GET_ENTRY(index + i);
-		if (KEY_EMPTY(ent->key)) {
+		if (!ent->key)
 			break;
-		}
-		if (strings_equal(var, &ent->key)) {
+		if (strings_equal(var, ent->key)) {
 			*val = ent->value;
 			return 0;
 		}

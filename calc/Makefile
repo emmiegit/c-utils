@@ -47,7 +47,7 @@ TARGET     := calc
 FLAGS      := -pipe
 WARN_FLAGS := -ansi -pedantic -Wall -Wextra -Wshadow -Wmissing-prototypes
 DEFN_FLAGS := -DGIT_HASH='"$(shell git rev-parse --short HEAD)"'
-COMP_FLAGS := -O2 -I.
+COMP_FLAGS := -I.
 LINK_FLAGS := -lm
 YACC_FLAGS :=
 LEX_FLAGS  := -f
@@ -58,15 +58,15 @@ LINK_FLAGS += -lreadline
 endif
 
 .PHONY: all
-all:
+all: COMP_FLAGS = -O3
 all: $(TARGET)
 
 .PHONY: debug
-debug: CFLAGS = -g
+debug: CFLAGS = -Og -g
 debug: $(TARGET)
 
 .PHONY: release
-release: CFLAGS = -Werror -fstack-protector-strong -DNDEBUG
+release: CFLAGS = -O2 -Werror -fstack-protector-strong -DNDEBUG
 release: $(TARGET)
 	$(ECHO_STR) $<
 
