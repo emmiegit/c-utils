@@ -25,6 +25,7 @@
 void input_init(void)
 {
 	rl_editing_mode = 0;
+	rl_bind_key('\t', rl_insert);
 }
 
 const char *get_line(void)
