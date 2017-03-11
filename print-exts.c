@@ -3,6 +3,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <dirent.h>
+#include <fcntl.h>
 #include <unistd.h>
 
 #include <errno.h>
@@ -23,6 +24,9 @@ static struct {
 
 static const char *ignore;
 static int recursive;
+
+/* Returns true if x is '.' or '..' */
+#define IS_DOT(x)			(((x)[0] == '.') && ((x)[1] == '.' || (x)[1] == '\0'))
 
 /* Data manipulation */
 static int compare(const void *_x, const void *_y)
@@ -55,11 +59,20 @@ static void resize(void)
 	exts.capacity = new_capacity;
 }
 
-static void add_entry(const char *ext)
+static void count_file(const char *name)
 {
 	struct entry *ent;
+	const char *ext;
+	char *ptr;
 	size_t i;
 
+	ptr = strrchr(name, '.');
+	if (!ptr) {
+		exts.none++;
+		return;
+	}
+
+	ext = ptr + 1;
 	for (i = 0; i < exts.len; i++) {
 		ent = &exts.array[i];
 		if (ext == ent->ext || !strcmp(ext, ent->ext)) {
@@ -77,50 +90,44 @@ static void add_entry(const char *ext)
 	ent->count = 1;
 }
 
-static void check_extension(const char *name, int dirfd)
-{
-	struct stat stbuf;
-	char *ptr;
-
-	/* Only consider regular files */
-	if (fstatat(dirfd, name, &stbuf, 0)) {
-		fprintf(stderr,
-			"Unable to stat '%s': %s\n",
-			name, strerror(errno));
-		exit(1);
-	}
-	if (!S_ISREG(stbuf.st_mode))
-		return;
-
-	ptr = strrchr(name, '.');
-	if (!ptr)
-		exts.none++;
-	else
-		add_entry(ptr + 1);
-}
-
 /* Filesystem scanning */
-static void scan_dir(const char *path)
+static void scan_dir(const char *path, int fd)
 {
 	struct dirent *dirent;
 	DIR *dh;
-	int fd;
 
-	dh = opendir(path);
+	fd = openat(fd, path, O_RDONLY);
+	if (fd < 0) {
+		fprintf(stderr,
+			"Unable to open handle for '%s': %s\n",
+			path, strerror(errno));
+		exit(1);
+	}
+	dh = fdopendir(fd);
 	if (!dh) {
 		fprintf(stderr,
 			"Unable to open directory '%s': %s\n",
 			path, strerror(errno));
 		exit(1);
 	}
-	fd = dirfd(dh);
-	if (fd < 0) {
-		perror("Unable to get directory descriptor");
-		exit(1);
-	}
 
-	while ((dirent = readdir(dh)) != NULL)
-		check_extension(dirent->d_name, fd);
+	while ((dirent = readdir(dh)) != NULL) {
+		struct stat stbuf;
+
+		if (fstatat(fd, dirent->d_name, &stbuf, 0)) {
+			fprintf(stderr,
+				"Unable to stat '%s': %s\n",
+				dirent->d_name, strerror(errno));
+			exit(1);
+		}
+		if (S_ISREG(stbuf.st_mode)) {
+			count_file(dirent->d_name);
+		} else if (S_ISDIR(stbuf.st_mode) && recursive) {
+			if (IS_DOT(dirent->d_name))
+				continue;
+			scan_dir(dirent->d_name, fd);
+		}
+	}
 
 	if (closedir(dh)) {
 		perror("Unable to close directory");
@@ -196,9 +203,9 @@ int main(int argc, char *argv[])
 	}
 
 	if (optind == argc)
-		scan_dir(".");
+		scan_dir(".", AT_FDCWD);
 	else for (i = optind; i < argc; i++)
-		scan_dir(argv[i]);
+		scan_dir(argv[i], AT_FDCWD);
 	print_result(reverse);
 	return 0;
 }
