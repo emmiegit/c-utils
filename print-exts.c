@@ -3,6 +3,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <dirent.h>
+#include <unistd.h>
 
 #include <errno.h>
 #include <stdlib.h>
@@ -19,6 +20,9 @@ static struct {
 	size_t len;
 	size_t capacity;
 } exts;
+
+static const char *ignore;
+static int recursive;
 
 /* Data manipulation */
 static int compare(const void *_x, const void *_y)
@@ -125,10 +129,11 @@ static void scan_dir(const char *path)
 }
 
 /* Output */
-static void print_result(void)
+static void print_result(int reverse)
 {
 	const char *format;
 	size_t i;
+	int none_flag;
 
 	if (!exts.len && !exts.none) {
 		puts("No files found.");
@@ -137,24 +142,63 @@ static void print_result(void)
 
 	qsort(exts.array, exts.len, sizeof(struct entry), compare);
 	format = "%6u : %s\n";
-	if (exts.none)
-		printf(format, exts.none, "(none)");
-	for (i = 0; i < exts.len; i++) {
-		const struct entry *ent;
+	none_flag = 1;
 
-		ent = &exts.array[i];
-		printf(format, ent->count, ent->ext);
+	if (reverse) {
+		for (i = 0; i < exts.len; i++) {
+			const struct entry *ent;
+
+			ent = &exts.array[exts.len - i - 1];
+			if (exts.none < ent->count && none_flag) {
+				printf(format, exts.none, "(none)");
+				none_flag = 0;
+			}
+			printf(format, ent->count, ent->ext);
+		}
+	} else {
+		for (i = 0; i < exts.len; i++) {
+			const struct entry *ent;
+
+			ent = &exts.array[i];
+			if (exts.none > ent->count && none_flag) {
+				printf(format, exts.none, "(none)");
+				none_flag = 0;
+			}
+			printf(format, ent->count, ent->ext);
+		}
 	}
 }
 
-int main(int argc, const char *argv[])
+int main(int argc, char *argv[])
 {
-	int i;
+	int reverse;
+	int ch, i;
 
-	if (argc == 1)
+	ignore = NULL;
+	recursive = 1;
+	reverse = 0;
+	while ((ch = getopt(argc, argv, ":ni:r")) != -1) {
+		switch (ch) {
+		case 'n':
+			recursive = 0;
+			break;
+		case 'i':
+			ignore = optarg;
+			break;
+		case 'r':
+			reverse = 1;
+			break;
+		case '?':
+			return 1;
+		default:
+			abort();
+		}
+	}
+
+	if (optind == argc)
 		scan_dir(".");
-	else for (i = 1; i < argc; i++)
+	else for (i = optind; i < argc; i++)
 		scan_dir(argv[i]);
-	print_result();
+	print_result(reverse);
 	return 0;
 }
