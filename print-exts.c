@@ -163,7 +163,6 @@ static void scan_dir(const char *path, int fd)
 			"Unable to open handle for '%s': %s\n",
 			path, strerror(errno));
 		ret = 1;
-		CHECK_ERRNO();
 		return;
 	}
 	dh = fdopendir(fd);
@@ -172,7 +171,6 @@ static void scan_dir(const char *path, int fd)
 			"Unable to open directory '%s': %s\n",
 			path, strerror(errno));
 		ret = 1;
-		CHECK_ERRNO();
 		return;
 	}
 	depth++;
