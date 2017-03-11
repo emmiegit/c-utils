@@ -27,10 +27,22 @@ static struct {
 	size_t len;
 } ignore;
 
-static int recursive;
+static int verbose, recursive;
+static unsigned int depth;
 
 /* Returns true if x is '.' or '..' */
-#define IS_DOT(x)			(((x)[0] == '.') && ((x)[1] == '.' || (x)[1] == '\0'))
+#define IS_DOT(x)					\
+	(((x)[0] == '.') && ((x)[1] == '.' || (x)[1] == '\0'))
+
+#define DEBUG(action, path)				\
+	do {						\
+		unsigned int __i;			\
+		if (!verbose)				\
+			break;				\
+		for (__i = 0; __i < depth; __i++)	\
+			putchar(' ');			\
+		printf("%s '%s'\n", (action), (path));	\
+	} while (0)
 
 /* Ignored files */
 static void add_ignore(const char *path)
@@ -51,8 +63,10 @@ static int check_ignore(const char *path)
 	size_t i;
 
 	for (i = 0; i < ignore.len; i++) {
-		if (!strcmp(ignore.array[i], path))
+		if (!strcmp(ignore.array[i], path)) {
+			DEBUG("ignoring", path);
 			return 1;
+		}
 	}
 	return 0;
 }
@@ -125,6 +139,7 @@ static void scan_dir(const char *path, int fd)
 	struct dirent *dirent;
 	DIR *dh;
 
+	DEBUG("entering", path);
 	fd = openat(fd, path, O_RDONLY);
 	if (fd < 0) {
 		fprintf(stderr,
@@ -139,6 +154,7 @@ static void scan_dir(const char *path, int fd)
 			path, strerror(errno));
 		exit(1);
 	}
+	depth++;
 
 	while ((dirent = readdir(dh)) != NULL) {
 		struct stat stbuf;
@@ -152,6 +168,7 @@ static void scan_dir(const char *path, int fd)
 			exit(1);
 		}
 		if (S_ISREG(stbuf.st_mode)) {
+			DEBUG("counting", dirent->d_name);
 			count_file(dirent->d_name);
 		} else if (S_ISDIR(stbuf.st_mode) && recursive) {
 			if (IS_DOT(dirent->d_name))
@@ -160,6 +177,8 @@ static void scan_dir(const char *path, int fd)
 		}
 	}
 
+	depth--;
+	DEBUG("leaving", path);
 	if (closedir(dh)) {
 		perror("Unable to close directory");
 		exit(1);
@@ -214,8 +233,11 @@ int main(int argc, char *argv[])
 
 	recursive = 1;
 	reverse = 0;
-	while ((ch = getopt(argc, argv, ":ni:r")) != -1) {
+	while ((ch = getopt(argc, argv, ":vni:r")) != -1) {
 		switch (ch) {
+		case 'v':
+			verbose = 1;
+			break;
 		case 'n':
 			recursive = 0;
 			break;
