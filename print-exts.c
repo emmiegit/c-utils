@@ -22,11 +22,40 @@ static struct {
 	size_t capacity;
 } exts;
 
-static const char *ignore;
+static struct {
+	const char **array;
+	size_t len;
+} ignore;
+
 static int recursive;
 
 /* Returns true if x is '.' or '..' */
 #define IS_DOT(x)			(((x)[0] == '.') && ((x)[1] == '.' || (x)[1] == '\0'))
+
+/* Ignored files */
+static void add_ignore(const char *path)
+{
+	void *ptr;
+
+	ptr = realloc(ignore.array, (ignore.len + 1) * sizeof(const char *));
+	if (!ptr) {
+		perror("Couldn't allocate buffer");
+		exit(1);
+	}
+	ignore.array = ptr;
+	ignore.array[ignore.len++] = path;
+}
+
+static int check_ignore(const char *path)
+{
+	size_t i;
+
+	for (i = 0; i < ignore.len; i++) {
+		if (!strcmp(ignore.array[i], path))
+			return 1;
+	}
+	return 0;
+}
 
 /* Data manipulation */
 static int compare(const void *_x, const void *_y)
@@ -114,6 +143,8 @@ static void scan_dir(const char *path, int fd)
 	while ((dirent = readdir(dh)) != NULL) {
 		struct stat stbuf;
 
+		if (check_ignore(dirent->d_name))
+			continue;
 		if (fstatat(fd, dirent->d_name, &stbuf, 0)) {
 			fprintf(stderr,
 				"Unable to stat '%s': %s\n",
@@ -181,7 +212,6 @@ int main(int argc, char *argv[])
 	int reverse;
 	int ch, i;
 
-	ignore = NULL;
 	recursive = 1;
 	reverse = 0;
 	while ((ch = getopt(argc, argv, ":ni:r")) != -1) {
@@ -190,7 +220,7 @@ int main(int argc, char *argv[])
 			recursive = 0;
 			break;
 		case 'i':
-			ignore = optarg;
+			add_ignore(optarg);
 			break;
 		case 'r':
 			reverse = 1;
