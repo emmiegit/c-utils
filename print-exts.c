@@ -28,6 +28,8 @@ static struct {
 } ignore;
 
 static int debug, recursive;
+
+static int ret;
 static unsigned int depth;
 
 /* Returns true if x is '.' or '..' */
@@ -42,6 +44,21 @@ static unsigned int depth;
 		for (__i = 0; __i < depth; __i++)	\
 			putchar(' ');			\
 		printf("%s '%s'\n", (action), (path));	\
+	} while (0)
+
+#define CHECK_ERRNO()					\
+	do {						\
+		switch (errno) {			\
+		case EACCES:				\
+		case ELOOP:				\
+		case ENAMETOOLONG:			\
+		case ENOENT:				\
+		case EPERM:				\
+		case ETXTBSY:				\
+			break;				\
+		default:				\
+			exit(1);			\
+		}					\
 	} while (0)
 
 /* Ignored files */
@@ -145,14 +162,18 @@ static void scan_dir(const char *path, int fd)
 		fprintf(stderr,
 			"Unable to open handle for '%s': %s\n",
 			path, strerror(errno));
-		exit(1);
+		ret = 1;
+		CHECK_ERRNO();
+		return;
 	}
 	dh = fdopendir(fd);
 	if (!dh) {
 		fprintf(stderr,
 			"Unable to open directory '%s': %s\n",
 			path, strerror(errno));
-		exit(1);
+		ret = 1;
+		CHECK_ERRNO();
+		return;
 	}
 	depth++;
 
@@ -166,6 +187,7 @@ static void scan_dir(const char *path, int fd)
 			fprintf(stderr,
 				"Unable to stat '%s': %s\n",
 				dirent->d_name, strerror(errno));
+			ret = 1;
 			continue;
 		}
 		if (S_ISREG(stbuf.st_mode)) {
@@ -269,5 +291,5 @@ int main(int argc, char *argv[])
 	else for (i = optind; i < argc; i++)
 		scan_dir(argv[i], AT_FDCWD);
 	print_result(reverse);
-	return 0;
+	return ret;
 }
