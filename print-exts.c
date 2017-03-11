@@ -27,7 +27,7 @@ static struct {
 	size_t len;
 } ignore;
 
-static int verbose, recursive;
+static int debug, recursive;
 static unsigned int depth;
 
 /* Returns true if x is '.' or '..' */
@@ -37,7 +37,7 @@ static unsigned int depth;
 #define DEBUG(action, path)				\
 	do {						\
 		unsigned int __i;			\
-		if (!verbose)				\
+		if (!debug)				\
 			break;				\
 		for (__i = 0; __i < depth; __i++)	\
 			putchar(' ');			\
@@ -159,20 +159,19 @@ static void scan_dir(const char *path, int fd)
 	while ((dirent = readdir(dh)) != NULL) {
 		struct stat stbuf;
 
-		if (check_ignore(dirent->d_name))
+		if (check_ignore(dirent->d_name) || IS_DOT(dirent->d_name))
 			continue;
+		DEBUG("stat", dirent->d_name);
 		if (fstatat(fd, dirent->d_name, &stbuf, 0)) {
 			fprintf(stderr,
 				"Unable to stat '%s': %s\n",
 				dirent->d_name, strerror(errno));
-			exit(1);
+			continue;
 		}
 		if (S_ISREG(stbuf.st_mode)) {
 			DEBUG("counting", dirent->d_name);
 			count_file(dirent->d_name);
 		} else if (S_ISDIR(stbuf.st_mode) && recursive) {
-			if (IS_DOT(dirent->d_name))
-				continue;
 			scan_dir(dirent->d_name, fd);
 		}
 	}
@@ -198,7 +197,7 @@ static void print_result(int reverse)
 	}
 
 	qsort(exts.array, exts.len, sizeof(struct entry), compare);
-	format = "%6u : %s\n";
+	format = "%8u %s\n";
 	none_flag = 1;
 
 	if (reverse) {
@@ -233,12 +232,23 @@ int main(int argc, char *argv[])
 
 	recursive = 1;
 	reverse = 0;
-	while ((ch = getopt(argc, argv, ":vni:r")) != -1) {
+	while ((ch = getopt(argc, argv, "dhNi:r")) != -1) {
 		switch (ch) {
-		case 'v':
-			verbose = 1;
+		case 'd':
+			debug = 1;
 			break;
-		case 'n':
+		case 'h':
+			printf("Usage: %s [-d] [-N] [-i FILE] [-r] DIR...\n"
+				"Usage: %s -h\n"
+				" -h        Print this help message\n"
+				" -d        Enable debug mode\n"
+				" -N        Disable recursion\n"
+				" -i FILE   Ignore the given file.\n"
+				"           (Can be given multiple times)\n"
+				" -r        Print in reverse order.\n",
+				argv[0], argv[0]);
+			exit(0);
+		case 'N':
 			recursive = 0;
 			break;
 		case 'i':
