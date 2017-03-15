@@ -42,7 +42,7 @@ static double parse_num(const char *str);
 
 %option stack yylineno
 
-NUM             ([0-9]+\.?[0-9]*([eE][-+]?[0-9]+)?)
+NUM             (([0-9]+\.?|\.)[0-9]*([eE][-+]?[0-9]+)?)
 HEX             (0[xX][0-9a-fA-F]+)
 INF             ([iI][nN][fF]([iI][nN][iI][tT][yY])?)
 NAN             ([nN][aA][nN])
