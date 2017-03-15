@@ -80,7 +80,9 @@ int yydebug = 1;
 
 /* Precedence order */
 %nonassoc '~' NUMBER VARIABLE LIST_VARS EXIT
-%left '+' '-' '*' '/' '^' FLOORDIV LSHIFT RSHIFT AND OR XOR
+%left '+' '-'
+%left '*' '/' FLOORDIV LSHIFT RSHIFT AND OR XOR
+%left '^'
 %left ','
 %left '(' ')' '[' ']' '{' '}'
 %nonassoc ABS ACOS ASIN ATAN ATANH CBRT CEIL COS COSH DIM EXP EXP2 FLOOR GAMMA LOG LOG10 LOG2 LOGB MAX MIN MOD RINT ROUND RT SIN SINH SQRT TAN TANH TRUNC
