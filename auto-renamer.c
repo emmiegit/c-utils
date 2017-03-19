@@ -157,6 +157,9 @@ static void read_event(const struct inotify_event *evt)
 
 	/* Rename new file */
 	rename_file(evt->name, evt->len, &maxf);
+
+	if (closedir(dh))
+		perror("Unable to close directory handle");
 }
 
 int main(int argc, const char *argv[])
