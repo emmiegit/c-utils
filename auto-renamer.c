@@ -10,7 +10,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <time.h>
 
 #define DEFAULT_DIRECTORY	"."
 #define INOTIFY_BUFFER_SIZE	(sizeof(struct inotify_event) + PATH_MAX + 1)
@@ -130,16 +129,11 @@ static void read_event(const struct inotify_event *evt)
 	struct max_filename maxf;
 	const struct dirent *dirent;
 	unsigned int digits;
-	time_t now;
 	DIR *dh;
 
 	/* Ignore events we don't care about */
 	if (evt->mask != IN_CREATE)
 		return;
-
-	/* Print to log */
-	now = time(NULL);
-	printf(">> [%s] %s", evt->name, ctime(&now));
 
 	maxf.number = 0;
 	maxf.width = 2;
