@@ -1,11 +1,5 @@
 #define _XOPEN_SOURCE 500
 
-#include <errno.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <time.h>
-
 #include <sys/types.h>
 #include <sys/inotify.h>
 #include <sys/wait.h>
@@ -13,6 +7,12 @@
 #include <pthread.h>
 #include <signal.h>
 #include <unistd.h>
+
+#include <errno.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
 
 #define DEFAULT_DIRECTORY	"."
 #define COMPILE_COMMAND		"pdflatex"
@@ -253,7 +253,5 @@ int main(int argc, const char *argv[])
 		}
 		read_event((struct inotify_event *)buf);
 	}
-
 	return 0;
 }
-
