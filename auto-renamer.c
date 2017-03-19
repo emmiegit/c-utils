@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 #define DEFAULT_DIRECTORY	"."
 #define INOTIFY_BUFFER_SIZE	(sizeof(struct inotify_event) + PATH_MAX + 1)
@@ -129,13 +130,16 @@ static void read_event(const struct inotify_event *evt)
 	struct max_filename maxf;
 	const struct dirent *dirent;
 	unsigned int digits;
+	time_t now;
 	DIR *dh;
 
-	/* Exit if the directory isn't in place any more */
-	if (evt->mask != IN_CREATE) {
-		puts("Directory was deleted or moved.");
-		exit(EXIT_SUCCESS);
-	}
+	/* Ignore events we don't care about */
+	if (evt->mask != IN_CREATE)
+		return;
+
+	/* Print to log */
+	now = time(NULL);
+	printf(">> [%s] %s", evt->name, ctime(&now));
 
 	maxf.number = 0;
 	maxf.width = 2;
@@ -182,7 +186,7 @@ int main(int argc, const char *argv[])
 		return EXIT_FAILURE;
 	}
 
-	wd = inotify_add_watch(inotify_fd, directory, IN_CREATE | IN_DELETE_SELF | IN_MOVE_SELF);
+	wd = inotify_add_watch(inotify_fd, directory, IN_CREATE);
 	if (wd < 0) {
 		fprintf(stderr, "Unable to add watch for \"%s\": %s\n",
 			directory, strerror(errno));
