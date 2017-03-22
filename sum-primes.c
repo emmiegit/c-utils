@@ -11,7 +11,7 @@ static void fill_array(void)
 	size_t i;
 
 	for (i = 0; i < len; i++)
-		primes[i] = i + 1;
+		primes[i] = i + 2;
 }
 
 static void sieve_eratosthenes(void)
@@ -56,18 +56,20 @@ static long sum_primes(void)
 int main(int argc, const char *argv[])
 {
 	long sum;
+	size_t max;
 
 	if (argc > 1) {
-		len = atol(argv[1]);
-		if (len <= 0) {
-			fprintf(stderr, "%s: max-value must be a positive, nonzero integer, not '%s'\n",
+		max = atol(argv[1]);
+		if (max <= 1) {
+			fprintf(stderr, "%s: max-value must be an integer greater than 2, not '%s'\n",
 				argv[0], argv[1]);
 			return 1;
 		}
 	} else {
-		len = 500;
+		max = 500;
 	}
 
+	len = max - 1;
 	primes = malloc(len * sizeof(long));
 	if (!primes) {
 		fprintf(stderr, "%s: unable to allocate array: %s\n",
@@ -81,7 +83,7 @@ int main(int argc, const char *argv[])
 	sum = sum_primes();
 
 	printf("Sum of all primes below %zu is %ld.\n",
-		len, sum);
+		max, sum);
 
 	free(primes);
 	return 0;
