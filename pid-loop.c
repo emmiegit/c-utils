@@ -13,30 +13,23 @@
 #include <unistd.h>
 #include <sys/types.h>
 
-#define BUFFER_SIZE 16
 #define SLEEP_DELAY 5
-#define ever (;;)
 
 int kill(pid_t process, int signal);
 
 int main()
 {
-    /* Read pid from stdin */
-    char buffer[BUFFER_SIZE];
-    fgets(buffer, BUFFER_SIZE, stdin);
-    const pid_t pid = atoi(buffer);
+	/* Read pid from stdin */
+	char buf[32];
+	pid_t pid;
 
-    /* Loop until pid exits */
-    int ret;
+	fgets(buf, sizeof(buf), stdin);
+	pid = atoi(buf);
 
-    for ever {
-        sleep(SLEEP_DELAY);
-
-        ret = kill(pid, 0);
-
-        if (ret < 0 && errno == ESRCH) {
-            return 0;
-        }
-    }
+	for (;;) {
+		sleep(SLEEP_DELAY);
+		if (kill(pid, 0) < 0 && errno == ESRCH)
+			return 0;
+	}
 }
 
