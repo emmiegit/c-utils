@@ -22,13 +22,15 @@ static void count(FILE *fh)
 			ret = 1;
 			return;
 		}
-		if (feof(fh))
-			return;
 
 		/* Count bytes */
 		for (i = 0; i < len; i++)
 			freq[buf[i]]++;
 		bytes += len;
+
+		/* Quit on EOF */
+		if (feof(fh))
+			return;
 	}
 }
 
@@ -38,12 +40,11 @@ static void print_results(void)
 
 	printf("Total bytes: %lu\n", bytes);
 	for (i = 0; i < ARRAY_SIZE(freq); i++) {
-		unsigned char ch;
+		const unsigned char ch = i;
 
 		if (!freq[i])
 			continue;
 
-		ch = i;
 		if (isgraph(ch) || ch == ' ')
 			printf("0x%02X (%c) - %lu\n",
 				ch, ch, freq[i]);
@@ -53,42 +54,58 @@ static void print_results(void)
 	}
 }
 
-int main(int argc, const char *argv[])
+static FILE **open_files(int argc, const char *argv[])
 {
 	FILE **files;
 	int i;
 
-	/* Allocate (FILE *) array */
 	files = malloc(argc * sizeof(FILE *));
 	if (!files) {
 		fprintf(stderr, "%s: unable to allocate: %s\n",
 			argv[0], strerror(errno));
-		return 1;
+		return NULL;
 	}
 
-	/* Open files */
-	if (argc == 1) {
-		files[0] = stdin;
-	} else for (i = 1; i < argc; i++) {
+	for (i = 1; i < argc; i++) {
 		FILE *fh;
 
-		fh = fopen(argv[i], "rb");
-		if (!fh) {
-			fprintf(stderr, "%s: %s: unable to open: %s\n",
-				argv[0], argv[i], strerror(errno));
-			return 1;
+		if (!strcmp(argv[i], "-")) {
+			fh = stdin;
+		} else {
+			fh = fopen(argv[i], "rb");
+			if (!fh) {
+				fprintf(stderr, "%s: %s: unable to open: %s\n",
+					argv[0], argv[i], strerror(errno));
+				return NULL;
+			}
 		}
 		files[i - 1] = fh;
 	}
+	return files;
+}
+
+int main(int argc, const char *argv[])
+{
+	FILE **files;
+	int i, len;
+
+	if (argc == 1) {
+		len = 1;
+		files = &stdin;
+	} else {
+		len = argc - 1;
+		files = open_files(argc, argv);
+		if (!files)
+			return 1;
+	}
 
 	/* Read and close files */
-	for (i = 0; i < argc - 1; i++) {
+	for (i = 0; i < len; i++) {
 		count(files[i]);
 		fclose(files[i]);
 	}
 
 	/* Print results */
 	print_results();
-
 	return ret;
 }
