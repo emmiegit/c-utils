@@ -150,6 +150,7 @@ static int unlink_directory(const char *const path)
 		}
 		sprintf(fullpath, "%s/%s", path, entry->d_name);
 
+#if defined(DT_DIR)
 		if (entry->d_type == DT_DIR) {
 			status += unlink_directory(fullpath);
 		} else if (entry->d_type == DT_LNK && IF_DELETE_SYMLINKS(opt.mode)) {
@@ -157,6 +158,9 @@ static int unlink_directory(const char *const path)
 		} else {
 			status += remove_recursive(fullpath);
 		}
+#else
+		status += remove_recursive(fullpath);
+#endif /* DT_DIR */
 		free(fullpath);
 	}
 	if (closedir(dir)) {
