@@ -1,16 +1,23 @@
 .PHONY: all release debug clean
 
-CC = gcc
-FLAGS = -ansi -Wall -Wextra -pipe -O3
-RELEASE_FLAGS = -fstack-protector-strong
+FLAGS     := -ansi -Wall -Wextra -pipe -O3
+REL_FLAGS := -fstack-protector-strong
 
-SOURCES = $(wildcard *.c)
-TARGETS = $(patsubst %.c,bin/%,$(SOURCES))
+SOURCES   := $(wildcard *.c)
+TARGETS   := $(patsubst %.c,bin/%,$(SOURCES))
+
+ifneq ($(shell uname),Linux)
+BLACKLIST := \
+	bin/auto-renamer \
+	bin/latex-autocompile \
+	bin/xfiller
+TARGETS   := $(filter-out $(BLACKLIST),$(TARGETS))
+endif
 
 all: bin $(TARGETS)
 
 release: bin
-	@make EXTRA_FLAGS='$(RELEASE_FLAGS)' $(TARGETS)
+	@make EXTRA_FLAGS='$(REL_FLAGS)' $(TARGETS)
 
 bin:
 	@echo '[MKDIR] bin'
