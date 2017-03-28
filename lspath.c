@@ -1,6 +1,7 @@
 #define _XOPEN_SOURCE	500
 
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <dirent.h>
 #include <limits.h>
 #include <regex.h>
@@ -100,6 +101,7 @@ static void split_path(void)
 
 static int is_dotdot(const char *name)
 {
+	/* Faster than (!strcmp(name, ".") || !strcmp(name, "..")) */
 	if (name[0] == '.') {
 		switch (name[1]) {
 		case '\0':
@@ -111,9 +113,32 @@ static int is_dotdot(const char *name)
 	return 0;
 }
 
+static int is_executable(const char *path)
+{
+	struct stat stbuf;
+
+	if (stat(path, &stbuf)) {
+		warn(path);
+		return 0;
+	}
+	if (!S_ISREG(stbuf.st_mode))
+		return 0;
+	if (access(path, X_OK))
+		return 0;
+	return 1;
+}
+
 static int path_matches(const char *name)
 {
-	return 1;
+	size_t i;
+
+	for (i = 0; i < patterns.len; i++) {
+		if (!regexec(&patterns.array[i],
+				name, 0, NULL,
+				REG_NOTBOL | REG_NOTEOL))
+			return 1;
+	}
+	return 0;
 }
 
 static void iterate_paths(void)
@@ -143,10 +168,8 @@ static void iterate_paths(void)
 			strncpy(file + off,
 				dirent->d_name,
 				sizeof(file) - off);
-			if (access(file, X_OK)) {
-				warn(file);
+			if (!is_executable(file))
 				continue;
-			}
 			if (!path_matches(dirent->d_name))
 				continue;
 			puts(file);
