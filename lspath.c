@@ -212,7 +212,7 @@ int main(int argc, char *argv[])
 		regex_t *re;
 		int err;
 
-		re = &patterns.array[i];
+		re = &patterns.array[i - optind];
 		err = regcomp(re, argv[i], opt.regexflags);
 		if (err) {
 			char errbuf[4096];
