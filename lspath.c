@@ -14,6 +14,7 @@
 
 static const char *argv0;
 static int ret;
+static int any;
 
 static struct {
 	regex_t *array;
@@ -128,7 +129,20 @@ static int is_executable(const char *path)
 	return 1;
 }
 
-static int path_matches(const char *name)
+static int matches_all(const char *name)
+{
+	size_t i;
+
+	for (i = 0; i < patterns.len; i++) {
+		if (regexec(&patterns.array[i],
+				name, 0, NULL,
+				REG_NOTBOL | REG_NOTEOL))
+			return 0;
+	}
+	return 1;
+}
+
+static int matches_any(const char *name)
 {
 	size_t i;
 
@@ -143,8 +157,10 @@ static int path_matches(const char *name)
 
 static void iterate_paths(void)
 {
+	int (*matches)(const char *);
 	size_t i;
 
+	matches = (any) ? matches_any : matches_all;
 	for (i = 0; i < paths.len; i++) {
 		DIR *dh;
 		const struct dirent *dirent;
@@ -170,7 +186,7 @@ static void iterate_paths(void)
 				sizeof(file) - off);
 			if (!is_executable(file))
 				continue;
-			if (!path_matches(dirent->d_name))
+			if (!matches(dirent->d_name))
 				continue;
 			puts(file);
 		}
@@ -180,21 +196,22 @@ static void iterate_paths(void)
 
 int main(int argc, char *argv[])
 {
-	struct {
-		int regexflags;
-	} opt;
+	int regexflags;
 	int i, ch;
 
 	/* Parse options */
 	argv0 = argv[0];
-	opt.regexflags = REG_NOSUB | REG_NEWLINE;
-	while ((ch = getopt(argc, argv, ":Ei")) != -1) {
+	regexflags = REG_NOSUB | REG_NEWLINE;
+	while ((ch = getopt(argc, argv, ":Eia")) != -1) {
 		switch (ch) {
 		case 'E':
-			opt.regexflags |= REG_EXTENDED;
+			regexflags |= REG_EXTENDED;
 			break;
 		case 'i':
-			opt.regexflags |= REG_ICASE;
+			regexflags |= REG_ICASE;
+			break;
+		case 'a':
+			any = 1;
 			break;
 		case '?':
 			return 1;
@@ -213,7 +230,7 @@ int main(int argc, char *argv[])
 		int err;
 
 		re = &patterns.array[i - optind];
-		err = regcomp(re, argv[i], opt.regexflags);
+		err = regcomp(re, argv[i], regexflags);
 		if (err) {
 			char errbuf[4096];
 
