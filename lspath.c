@@ -27,6 +27,14 @@ static struct {
 	size_t len;
 } paths;
 
+#if defined(__apple__)
+/*
+ * Mac doesn't provide a definition for strdup()
+ * for some reason...
+ */
+char *strdup(const char *s);
+#endif /* __apple__ */
+
 /* Utilities */
 static void cleanup(void)
 {
