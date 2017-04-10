@@ -3,8 +3,12 @@
 FLAGS     := -ansi -Wall -Wextra -pipe -O3
 REL_FLAGS := -fstack-protector-strong
 
+MORE      := \
+	bin/isbe \
+	bin/isle
+
 SOURCES   := $(wildcard *.c)
-TARGETS   := $(patsubst %.c,bin/%,$(SOURCES))
+TARGETS   := $(patsubst %.c,bin/%,$(SOURCES)) $(MORE)
 
 ifneq ($(shell uname),Linux)
 BLACKLIST := \
@@ -42,6 +46,10 @@ bin/latex-autocompile: latex-autocompile.c
 bin/int-values: int-values.c
 	@echo '[CC] $(@F)'
 	@$(CC) $(FLAGS) $(EXTRA_FLAGS) -Wno-shift-count-overflow -Wno-overflow -o $@ $<
+
+bin/isbe bin/isle: bin/endian
+	@echo '[LN] $(@F)'
+	@ln -sf endian $@
 
 bin/%: %.c
 	@echo '[CC] $(@F)'
