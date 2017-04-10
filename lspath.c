@@ -30,7 +30,7 @@ static struct {
 #if defined(__APPLE__)
 /*
  * Mac doesn't provide a definition for strdup()
- * for some reason...
+ * in <string.h> for some reason.
  */
 char *strdup(const char *s);
 #endif /* __APPLE__ */
@@ -142,9 +142,7 @@ static int matches_all(const char *name)
 	size_t i;
 
 	for (i = 0; i < patterns.len; i++) {
-		if (regexec(&patterns.array[i],
-				name, 0, NULL,
-				REG_NOTBOL | REG_NOTEOL))
+		if (regexec(&patterns.array[i], name, 0, NULL, 0))
 			return 0;
 	}
 	return 1;
@@ -155,9 +153,7 @@ static int matches_any(const char *name)
 	size_t i;
 
 	for (i = 0; i < patterns.len; i++) {
-		if (!regexec(&patterns.array[i],
-				name, 0, NULL,
-				REG_NOTBOL | REG_NOTEOL))
+		if (!regexec(&patterns.array[i], name, 0, NULL, 0))
 			return 1;
 	}
 	return 0;
