@@ -4,6 +4,9 @@
 #include <sys/stat.h>
 #include <dirent.h>
 #include <fcntl.h>
+#include <ftw.h>
+#include <libgen.h>
+#include <limits.h>
 #include <unistd.h>
 
 #include <errno.h>
@@ -27,39 +30,11 @@ static struct {
 	size_t len;
 } ignore;
 
-static int debug, recursive;
-
+static int recursive;
 static int ret;
-static unsigned int depth;
 
-/* Returns true if x is '.' or '..' */
-#define IS_DOT(x)					\
-	(((x)[0] == '.') && ((x)[1] == '.' || (x)[1] == '\0'))
-
-#define DEBUG(action, path)				\
-	do {						\
-		unsigned int __i;			\
-		if (!debug)				\
-			break;				\
-		for (__i = 0; __i < depth; __i++)	\
-			putchar(' ');			\
-		printf("%s '%s'\n", (action), (path));	\
-	} while (0)
-
-#define CHECK_ERRNO()					\
-	do {						\
-		switch (errno) {			\
-		case EACCES:				\
-		case ELOOP:				\
-		case ENAMETOOLONG:			\
-		case ENOENT:				\
-		case EPERM:				\
-		case ETXTBSY:				\
-			break;				\
-		default:				\
-			exit(1);			\
-		}					\
-	} while (0)
+#define UNUSED(x)	((void)(x))
+#define MAX_FD		32
 
 /* Ignored files */
 static void add_ignore(const char *path)
@@ -81,7 +56,6 @@ static int check_ignore(const char *path)
 
 	for (i = 0; i < ignore.len; i++) {
 		if (!strcmp(ignore.array[i], path)) {
-			DEBUG("ignoring", path);
 			return 1;
 		}
 	}
@@ -151,56 +125,46 @@ static void count_file(const char *name)
 }
 
 /* Filesystem scanning */
-static void scan_dir(const char *path, int fd)
+static int scan_cbf(const char *fpath,
+		    const struct stat *stbuf,
+		    int ftype)
 {
-	struct dirent *dirent;
-	DIR *dh;
+	char _name[PATH_MAX], *name;
 
-	DEBUG("entering", path);
-	fd = openat(fd, path, O_RDONLY);
-	if (fd < 0) {
+	UNUSED(stbuf);
+
+	strcpy(_name, fpath);
+	name = basename(_name);
+
+	if (check_ignore(name))
+		return 0;
+
+	switch (ftype) {
+	case FTW_F:
+		count_file(name);
+		break;
+	case FTW_D:
+		/* nothing to do */
+		break;
+	case FTW_DNR:
+	case FTW_NS:
+	case FTW_SLN:
 		fprintf(stderr,
-			"Unable to open handle for '%s': %s\n",
-			path, strerror(errno));
+			"Unable to open file: %s\n",
+			fpath);
+		break;
+	default:
+		abort();
+	}
+	return 0;
+}
+
+static void scan_dir(const char *path)
+{
+	if (ftw(path, scan_cbf, MAX_FD)) {
+		fputs("Errors while iterating.\n", stderr);
 		ret = 1;
 		return;
-	}
-	dh = fdopendir(fd);
-	if (!dh) {
-		fprintf(stderr,
-			"Unable to open directory '%s': %s\n",
-			path, strerror(errno));
-		ret = 1;
-		return;
-	}
-	depth++;
-
-	while ((dirent = readdir(dh)) != NULL) {
-		struct stat stbuf;
-
-		if (check_ignore(dirent->d_name) || IS_DOT(dirent->d_name))
-			continue;
-		DEBUG("stat", dirent->d_name);
-		if (fstatat(fd, dirent->d_name, &stbuf, 0)) {
-			fprintf(stderr,
-				"Unable to stat '%s': %s\n",
-				dirent->d_name, strerror(errno));
-			ret = 1;
-			continue;
-		}
-		if (S_ISREG(stbuf.st_mode)) {
-			DEBUG("counting", dirent->d_name);
-			count_file(dirent->d_name);
-		} else if (S_ISDIR(stbuf.st_mode) && recursive) {
-			scan_dir(dirent->d_name, fd);
-		}
-	}
-
-	depth--;
-	DEBUG("leaving", path);
-	if (closedir(dh)) {
-		perror("Unable to close directory");
-		exit(1);
 	}
 }
 
@@ -225,11 +189,11 @@ static void print_result(int reverse)
 			const struct entry *ent;
 
 			ent = &exts.array[exts.len - i - 1];
+			printf(format, ent->count, ent->ext);
 			if (exts.none < ent->count && none_flag) {
 				printf(format, exts.none, "(none)");
 				none_flag = 0;
 			}
-			printf(format, ent->count, ent->ext);
 		}
 	} else {
 		for (i = 0; i < exts.len; i++) {
@@ -243,6 +207,8 @@ static void print_result(int reverse)
 			printf(format, ent->count, ent->ext);
 		}
 	}
+	if (none_flag)
+		printf(format, exts.none, "(none)");
 }
 
 int main(int argc, char *argv[])
@@ -254,9 +220,6 @@ int main(int argc, char *argv[])
 	reverse = 0;
 	while ((ch = getopt(argc, argv, "dhNi:r")) != -1) {
 		switch (ch) {
-		case 'd':
-			debug = 1;
-			break;
 		case 'h':
 			printf("Usage: %s [-d] [-N] [-i FILE] [-r] DIR...\n"
 				"Usage: %s -h\n"
@@ -285,9 +248,9 @@ int main(int argc, char *argv[])
 	}
 
 	if (optind == argc)
-		scan_dir(".", AT_FDCWD);
+		scan_dir(".");
 	else for (i = optind; i < argc; i++)
-		scan_dir(argv[i], AT_FDCWD);
+		scan_dir(argv[i]);
 	print_result(reverse);
 	return ret;
 }

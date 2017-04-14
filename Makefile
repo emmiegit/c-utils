@@ -24,7 +24,7 @@ release: bin
 	@make EXTRA_FLAGS='$(REL_FLAGS)' $(TARGETS)
 
 bin:
-	@echo '[MKDIR] bin'
+	@echo '[MD] bin'
 	@mkdir -p bin
 
 bin/curses_getch: getch.c
