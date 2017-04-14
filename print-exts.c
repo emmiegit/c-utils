@@ -162,7 +162,9 @@ static int scan_cbf(const char *fpath,
 static void scan_dir(const char *path)
 {
 	if (ftw(path, scan_cbf, MAX_FD)) {
-		fputs("Errors while iterating.\n", stderr);
+		fprintf(stderr,
+			"Errors while iterating in '%s': %s\n",
+			path, strerror(errno));
 		ret = 1;
 		return;
 	}
