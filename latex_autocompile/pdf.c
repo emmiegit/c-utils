@@ -105,7 +105,6 @@ static void _child_(int signum, siginfo_t *inf, void *ucontext)
 
 	if (inf->si_pid == pid)
 		pid = 0;
-
 	if (waitpid(inf->si_pid, NULL, 0) < 0) {
 		if (errno != ECHILD)
 			die("Unable to wait");
@@ -150,6 +149,7 @@ void pdf_init(void)
 
 	act.sa_flags = SA_SIGINFO;
 	act.sa_sigaction = _child_;
+	sigemptyset(&act.sa_mask);
 	if (sigaction(SIGCHLD, &act, NULL))
 		die("Unable to set SIGCHLD action");
 }
@@ -157,6 +157,9 @@ void pdf_init(void)
 void pdf_cleanup(void)
 {
 	running = 0;
+	if (pthread_join(thread, NULL))
+		die("Unable to join PDF thread");
+	free(filename);
 }
 
 void pdf_trigger(const char *name)

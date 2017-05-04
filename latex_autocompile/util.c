@@ -51,7 +51,7 @@ char *replace_ext(const char *str, const char *ext, size_t extlen)
 
 	len = strlen(str);
 	assert(extlen <= len);
-	new = malloc(len);
+	new = malloc(len + 1);
 	if (!new)
 		die("Unable to allocate memory");
 
