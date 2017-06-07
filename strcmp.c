@@ -5,7 +5,12 @@
 
 int main(int argc, const char *argv[])
 {
+	int cmp;
+
 	if (argc != 3)
 		return 128;
-	return SIGN(strcmp(argv[1], argv[2]));
+
+	cmp = SIGN(strcmp(argv[1], argv[2]));
+	printf("%d\n", cmp);
+	return !!cmp;
 }
