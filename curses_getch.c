@@ -6,7 +6,7 @@ int main()
 	int counter;
 
 	if (!initscr()) {
-		perror("Unable to initalize curses");
+		fputs("Unable to initalize curses\n", stderr);
 		return 1;
 	}
 

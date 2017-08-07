@@ -1,6 +1,6 @@
 .PHONY: all release debug clean
 
-FLAGS     := -ansi -Wall -Wextra -pipe -O3
+FLAGS     := -std=c99 -pedantic -Wall -Wextra -Wno-long-long -pipe -O3
 REL_FLAGS := -fstack-protector-strong
 
 MORE      := \
@@ -28,6 +28,10 @@ bin:
 	@mkdir -p bin
 
 bin/curses_getch: curses_getch.c
+	@echo '[CC] $(@F)'
+	@$(CC) $(FLAGS) $(EXTRA_FLAGS) -lncurses -o $@ $<
+
+bin/curses_acs: curses_acs.c
 	@echo '[CC] $(@F)'
 	@$(CC) $(FLAGS) $(EXTRA_FLAGS) -lncurses -o $@ $<
 
