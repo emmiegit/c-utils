@@ -12,6 +12,7 @@ int main()
 
 	raw();
 	keypad(stdscr, TRUE);
+	mousemask(ALL_MOUSE_EVENTS, NULL);
 
 	printw("Start entering characters:\n(Hit 'q' to quit.)\n");
 
@@ -32,7 +33,7 @@ int main()
 			return 0;
 		}
 
-		printw("\nID: %d\n", ch);
+		printw("\nKey: %s\nID: %d\n", keyname(ch), ch);
 	}
 
 	endwin();
