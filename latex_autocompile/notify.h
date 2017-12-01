@@ -23,9 +23,16 @@
 #ifndef _NOTIFY_H_
 #define _NOTIFY_H_
 
+#include <stdbool.h>
+
 #include "core.h"
 
-void notify_init(const char *directory);
+struct notify_settings {
+	bool open_pdf   : 1;
+	bool reload_pdf : 1;
+};
+
+void notify_init(const char *directory, const struct notify_settings *opt);
 void notify_cleanup(void);
 int notify_read(void);
 

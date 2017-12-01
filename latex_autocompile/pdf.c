@@ -40,6 +40,7 @@ static pthread_t thread;
 static char *filename;
 static pid_t pid;
 static int running;
+static int send_sighup;
 
 /* Locks */
 
@@ -129,7 +130,7 @@ static void *_thread_(void *arg)
 		if (!pid || filename != last_filename) {
 			reopen();
 			last_filename = filename;
-		} else {
+		} else if (send_sighup) {
 			refresh();
 		}
 		unlock();
@@ -139,11 +140,13 @@ static void *_thread_(void *arg)
 
 /* Externals */
 
-void pdf_init(void)
+void pdf_init(int reload_pdf)
 {
 	struct sigaction act;
 
+	send_sighup = reload_pdf;
 	running = 1;
+
 	if (pthread_create(&thread, NULL, _thread_, NULL))
 		die("Unable to start PDF thread");
 

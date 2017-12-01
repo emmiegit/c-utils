@@ -25,14 +25,16 @@
 #include <unistd.h>
 
 #include <errno.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
 #include "notify.h"
 #include "pdf.h"
 #include "util.h"
 
+static struct notify_settings opt;
 static int ifd, wd;
 
 /* Utilities */
@@ -55,13 +57,17 @@ static void read_event(const struct inotify_event *event)
 		exit(0);
 	}
 
-	pdf_trigger(event->name);
+	if (opt.open_pdf) {
+		pdf_trigger(event->name);
+	}
 }
 
 /* Externals */
 
-void notify_init(const char *directory)
+void notify_init(const char *directory, const struct notify_settings *settings)
 {
+	memcpy(&opt, settings, sizeof(struct notify_settings));
+
 	ifd = inotify_init1(IN_CLOEXEC);
 	if (ifd < 0)
 		die("Unable to initialize inotify");

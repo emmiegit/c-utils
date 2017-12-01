@@ -29,13 +29,34 @@
 #include "pdf.h"
 #include "util.h"
 
-int main(int argc, const char *argv[])
+int main(int argc, char **argv)
 {
 	const char *directory;
+	struct notify_settings opt;
+	int ch;
+
+	opt.open_pdf = true;
+	opt.reload_pdf = false;
+
+	while ((ch = getopt(argc, argv, "nr")) != -1) {
+		switch (ch) {
+		case 'n':
+			opt.open_pdf = false;
+			break;
+		case 'r':
+			opt.reload_pdf = true;
+			break;
+		case '?':
+			die("Unknown option: '-%c'", optopt);
+			break;
+		default:
+			abort();
+		}
+	}
 
 	/* Go to directory */
-	if (argc > 1)
-		directory = argv[1];
+	if (optind < argc)
+		directory = argv[optind];
 	else
 		directory = DEFAULT_DIRECTORY;
 
@@ -44,11 +65,13 @@ int main(int argc, const char *argv[])
 	printf("Listening on \"%s\"\n", directory);
 
 	/* Initialize */
-	notify_init(directory);
-	pdf_init();
-
+	notify_init(directory, &opt);
 	atexit(notify_cleanup);
-	atexit(pdf_cleanup);
+
+	if (opt.open_pdf) {
+		pdf_init(opt.reload_pdf);
+		atexit(pdf_cleanup);
+	}
 
 	/* Main loop */
 	for (;;) {

@@ -35,6 +35,7 @@ ECHO_LD     = $(ECHO_LD_$(V))
 CC_FLAGS   := \
 	-ansi -pedantic -Wall -Wextra -Wshadow -Wmissing-prototypes -Wcast-qual \
 	-I. -pthread \
+	-fPIC \
 	-DGIT_HASH='"$(shell git rev-parse --short HEAD)"' -D_XOPEN_SOURCE=500
 LD_FLAGS   := \
 	-pthread

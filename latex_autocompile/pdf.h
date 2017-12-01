@@ -25,7 +25,7 @@
 
 #include "core.h"
 
-void pdf_init(void);
+void pdf_init(int send_sighup);
 void pdf_cleanup(void);
 void pdf_trigger(const char *name);
 
