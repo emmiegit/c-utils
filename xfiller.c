@@ -1,6 +1,7 @@
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <GL/glx.h>
+#include <sched.h>
 #include <unistd.h>
 
 #include <stdlib.h>
@@ -56,11 +57,12 @@ int main(void)
 
 	dis = XOpenDisplay(NULL);;
 	if (!dis) {
-		fprintf(stderr, "Unable to open X display.\n");
+		fputs("Unable to open X display.\n", stderr);
 		exit(1);
 	}
 	create_window(dis, &wm_delete_msg);
 	for (;;) {
+		sched_yield();
 		XNextEvent(dis, &evt);
 		if ((Atom)evt.xclient.data.l[0] == wm_delete_msg) {
 			break;
@@ -69,4 +71,3 @@ int main(void)
 	XCloseDisplay(dis);
 	return 0;
 }
-
