@@ -143,7 +143,7 @@ int hashmap_insert(struct hashmap *const map, struct hashmap_key *const key, con
 	return -1;
 }
 
-int hashmap_replace(struct hashmap *const map, struct hashmap_key *const key, const void *const value)
+int hashmap_update(struct hashmap *const map, struct hashmap_key *const key, const void *const value)
 {
 	size_t index;
 	struct hashmap_entry *entry;
@@ -172,7 +172,7 @@ int hashmap_replace(struct hashmap *const map, struct hashmap_key *const key, co
 	return -1;
 }
 
-int hashmap_update(struct hashmap *const map, struct hashmap_key *const key, const void *const value)
+int hashmap_put(struct hashmap *const map, struct hashmap_key *const key, const void *const value)
 {
 	size_t index;
 	struct hashmap_entry *entry;
@@ -262,7 +262,7 @@ int hashmap_remove(struct hashmap *const map, struct hashmap_key *const key)
 	return -1;
 }
 
-int hashmap_contains_key(struct hashmap *const map, struct hashmap_key *const key)
+int hashmap_contains_key(const struct hashmap *const map, struct hashmap_key *const key)
 {
 	size_t index;
 	struct hashmap_entry *entry;
@@ -288,7 +288,7 @@ int hashmap_contains_key(struct hashmap *const map, struct hashmap_key *const ke
 	return -1;
 }
 
-int hashmap_get(struct hashmap *const map, struct hashmap_key *const key, void **const value)
+int hashmap_get(const struct hashmap *const map, struct hashmap_key *const key, void **const value)
 {
 	size_t index;
 	struct hashmap_entry *entry;
@@ -374,7 +374,7 @@ void **hashmap_list_values(struct hashmap *const map)
 	return values;
 }
 
-int hashmap_for_each(struct hashmap *const map,
+int hashmap_for_each(const struct hashmap *const map,
 	int (*cbf)(void *arg, struct hashmap_key *key, void *value), void *arg)
 {
 	struct hashmap_entry *entry;
@@ -391,12 +391,11 @@ int hashmap_for_each(struct hashmap *const map,
 			}
 
 			while (entry->overflow && !ENTRY_IS_EMPTY(entry->overflow)) {
+				entry = entry->overflow;
 				ret = cbf(arg, &entry->key, (void *)entry->value);
 				if (ret) {
 					return 1;
 				}
-
-				entry = entry->overflow;
 			}
 		}
 	}
@@ -404,3 +403,28 @@ int hashmap_for_each(struct hashmap *const map,
 	return 0;
 }
 
+int hashmap_map(struct hashmap *map,
+	int (*cbf)(void *arg, struct hashmap_entry *entry), void *arg)
+{
+	struct hashmap_entry *entry;
+	size_t i;
+
+	for (i = 0; i < map->capacity; i++) {
+		entry = &map->items[i];
+
+		if (!ENTRY_IS_EMPTY(entry)) {
+			if (cbf(arg, entry)) {
+				return 1;
+			}
+
+			while (entry->overflow && !ENTRY_IS_EMPTY(entry->overflow)) {
+				entry = entry->overflow;
+				if (cbf(arg, entry)) {
+					return 1;
+				}
+			}
+		}
+	}
+
+	return 0;
+}
