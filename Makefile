@@ -27,11 +27,11 @@ bin:
 	@echo '[MD] bin'
 	@mkdir -p bin
 
-bin/curses_getch: curses_getch.c
+bin/curses-getch: curses-getch.c
 	@echo '[CC] $(@F)'
 	@$(CC) $(FLAGS) $(EXTRA_FLAGS) -lncurses -o $@ $<
 
-bin/curses_acs: curses_acs.c
+bin/curses-acs: curses-acs.c
 	@echo '[CC] $(@F)'
 	@$(CC) $(FLAGS) $(EXTRA_FLAGS) -lncurses -o $@ $<
 
