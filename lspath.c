@@ -40,8 +40,9 @@ static void cleanup(void)
 {
 	size_t i;
 
-	for (i = 0; i < patterns.len; i++)
+	for (i = 0; i < patterns.len; i++) {
 		regfree(&patterns.array[i]);
+	}
 	free(patterns.array);
 	free(paths.array);
 	exit(ret);
@@ -78,18 +79,21 @@ static void split_path(void)
 
 	/* Get buffer */
 	var = getenv("PATH");
-	if (!var)
+	if (!var) {
 		cleanup();
+	}
 
 	paths.str = strdup(var);
-	if (!paths.str)
+	if (!paths.str) {
 		error("strdup() failed");
+	}
 
 	/* Count items */
 	paths.len = 0;
 	for (i = 0; paths.str[i]; i++) {
-		if (paths.str[i] == ':')
+		if (paths.str[i] == ':') {
 			paths.len++;
+		}
 	}
 
 	/* Prepare paths struct */
@@ -130,10 +134,12 @@ static int is_executable(const char *path)
 		warn(path);
 		return 0;
 	}
-	if (!S_ISREG(stbuf.st_mode))
+	if (!S_ISREG(stbuf.st_mode)) {
 		return 0;
-	if (access(path, X_OK))
+	}
+	if (access(path, X_OK)) {
 		return 0;
+	}
 	return 1;
 }
 
@@ -142,8 +148,9 @@ static int matches_all(const char *name)
 	size_t i;
 
 	for (i = 0; i < patterns.len; i++) {
-		if (regexec(&patterns.array[i], name, 0, NULL, 0))
+		if (regexec(&patterns.array[i], name, 0, NULL, 0)) {
 			return 0;
+		}
 	}
 	return 1;
 }
@@ -153,8 +160,9 @@ static int matches_any(const char *name)
 	size_t i;
 
 	for (i = 0; i < patterns.len; i++) {
-		if (!regexec(&patterns.array[i], name, 0, NULL, 0))
+		if (!regexec(&patterns.array[i], name, 0, NULL, 0)) {
 			return 1;
+		}
 	}
 	return 0;
 }
@@ -227,8 +235,9 @@ int main(int argc, char *argv[])
 	/* Prepare regular expressions */
 	patterns.len = (size_t)(argc - optind);
 	patterns.array = malloc(patterns.len * sizeof(regex_t));
-	if (!patterns.array)
+	if (!patterns.array) {
 		error("malloc() failed");
+	}
 	for (i = optind; i < argc; i++) {
 		regex_t *re;
 		int err;
