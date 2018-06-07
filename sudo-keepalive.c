@@ -123,10 +123,16 @@ int main(int argc, char **argv)
 	if (main_pid) {
 		/* parent */
 		for (;;) {
-			spawn_sudo();
-
 			if (nanosleep(&delay, NULL)) {
 				assert(errno != EINVAL);
+			}
+
+			spawn_sudo();
+
+			if (kill(main_pid, 0)) {
+				if (errno == ESRCH) {
+					break;
+				}
 			}
 		}
 	} else {
