@@ -1,5 +1,6 @@
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
+#include <X11/Xutil.h>
 #include <GL/glx.h>
 #include <sched.h>
 #include <unistd.h>
@@ -13,40 +14,49 @@
 #define DEFAULT_WIDTH		850
 #define DEFAULT_HEIGHT		700
 
-static void create_window(Display *dis, Atom *ptr)
+static void create_window(Display *display, Atom *ptr)
 {
 	Window win;
 	XTextProperty window_name;
+	XVisualInfo vinfo;
+	XSetWindowAttributes attr;
 	char title[64];
-	int black_color;
 
-	black_color = BlackPixel(dis, DefaultScreen(dis));
-	win = XCreateSimpleWindow(dis,
-				  DefaultRootWindow(dis),
-				  DEFAULT_X,
-				  DEFAULT_Y,
-				  DEFAULT_WIDTH,
-				  DEFAULT_HEIGHT,
-				  0,
-				  0,
-				  black_color);
+	XMatchVisualInfo(display, DefaultScreen(display), 32, TrueColor, &vinfo);
+	attr.colormap = XCreateColormap(display,
+					DefaultRootWindow(display),
+					vinfo.visual,
+					AllocNone);
+	attr.border_pixel = 0;
+	attr.background_pixel = 0;
+
+	win = XCreateWindow(display,
+			    DefaultRootWindow(display),
+			    DEFAULT_X,
+			    DEFAULT_Y,
+			    DEFAULT_WIDTH,
+			    DEFAULT_HEIGHT,
+			    0,
+			    vinfo.depth,
+			    InputOutput,
+			    vinfo.visual,
+			    CWColormap | CWBorderPixel | CWBackPixel, &attr);
 	if (!win) {
 		fprintf(stderr, "Unable to create window.\n");
 		exit(1);
 	}
 
-	*ptr = XInternAtom(dis, "WM_DELETE_WINDOW", False);
-	XSetWMProtocols(dis, win, ptr, 1);
-	XSelectInput(dis, win, KeyPressMask);
-	XMapWindow(dis, win);
+	*ptr = XInternAtom(display, "WM_DELETE_WINDOW", False);
+	XSetWMProtocols(display, win, ptr, 1);
+	XSelectInput(display, win, KeyPressMask);
+	XMapWindow(display, win);
 
-	sprintf(title, "xfiller - pid %d", getpid());
+	sprintf(title, "[%d] xfiller", getpid());
 	window_name.value = (unsigned char *)title;
 	window_name.encoding = XA_STRING;
 	window_name.format = 8;
 	window_name.nitems = strlen(title);
-
-	XSetWMName(dis, win, &window_name);
+	XSetWMName(display, win, &window_name);
 }
 
 int main(void)
