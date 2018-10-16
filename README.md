@@ -6,6 +6,7 @@ All files are available under the MIT license unless otherwise specified. Check 
 ### Single file programs
 * `getchar` - Read a character from stdin and identify it.
 * `getch` - `getchar`, but in curses. Accepts weird keys like page down.
+* `lspath` - Search for all executables on your `$PATH` that match the given pattern(s).
 * `pid-loop` - Simple program that reads a pid from stdin and stays alive as long as the process it's tracking is alive. Not very fancy.
 * `xfiller` - An X11 program that opens a window. That's it. Useful for padding on tiling WMs.
 
@@ -22,4 +23,3 @@ A "standard library" or something. Not super useful right now. The eventual idea
 Generally I write strictly ANSI C, so you should have no problem finding a compatible compiler. Other than that, dependencies vary on the program. For example, `xfiller` obviously depends on Xlib.
 
 Be sure you invoke `make` in each directory manually, since the top level Makefile only compiles sources directly in that directory.
-
