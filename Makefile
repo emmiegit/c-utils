@@ -65,4 +65,3 @@ debug:
 clean:
 	@echo '[RM] bin'
 	@rm -rf bin
-
