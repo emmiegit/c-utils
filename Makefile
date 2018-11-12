@@ -63,6 +63,6 @@ debug:
 	@make EXTRA_FLAGS='-g -Og'
 
 clean:
-	@echo '[RMDIR] bin'
+	@echo '[RM] bin'
 	@rm -rf bin
 
