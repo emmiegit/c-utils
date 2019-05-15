@@ -63,6 +63,7 @@ HELP            ([hH][eE][lL][pP])
 {NAN}           { yylval.val = NAN; return NUMBER; }
 [pP][iI]        { yylval.val = M_PI; return NUMBER; }
 [eE]            { yylval.val = M_E; return NUMBER; }
+[pP][hH][iI]    { yylval.val = 1.618034; return NUMBER; }
 "+"             { return '+'; }
 "-"             { return '-'; }
 "*"             { return '*'; }
