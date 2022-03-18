@@ -123,7 +123,8 @@ static void count_file(const char *name)
 
 	/* Add new extension */
 	ent = &exts.array[exts.len++];
-	strncpy(ent->ext, ext, sizeof(ent->ext));
+	strncpy(ent->ext, ext, sizeof(ent->ext) - 1);
+	ent->ext[sizeof(ent->ext) - 1] = '\0';
 	ent->count = 1;
 }
 
