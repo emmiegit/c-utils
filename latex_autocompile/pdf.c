@@ -46,26 +46,30 @@ static int send_sighup;
 
 static void lock(void)
 {
-	if (pthread_mutex_lock(&mutex))
+	if (pthread_mutex_lock(&mutex)) {
 		die("Unable to lock mutex");
+	}
 }
 
 static void unlock(void)
 {
-	if (pthread_mutex_unlock(&mutex))
+	if (pthread_mutex_unlock(&mutex)) {
 		die("Unable to unlock mutex");
+	}
 }
 
 static void cond_wait(void)
 {
-	if (pthread_cond_wait(&cond, &mutex))
+	if (pthread_cond_wait(&cond, &mutex)) {
 		die("Unable to wait on condition");
+	}
 }
 
 static void cond_broadcast(void)
 {
-	if (pthread_cond_broadcast(&cond))
+	if (pthread_cond_broadcast(&cond)) {
 		die("Unable to broadcast on condition");
+	}
 }
 
 /* Utilities */
@@ -73,12 +77,14 @@ static void cond_broadcast(void)
 void reopen(void)
 {
 	if (pid > 0) {
-		if (kill(pid, SIGTERM))
+		if (kill(pid, SIGTERM)) {
 			perror("Unable to send SIGTERM");
+		}
 	}
 
-	if ((pid = FORK()) < 0)
+	if ((pid = FORK()) < 0) {
 		die("Unable to fork");
+	}
 	if (pid == 0) {
 		/* We are the child */
 		close(STDIN_FILENO);
@@ -92,8 +98,9 @@ void reopen(void)
 void refresh(void)
 {
 	if (pid > 0) {
-		if (kill(pid, SIGHUP))
+		if (kill(pid, SIGHUP)) {
 			perror("Unable to send SIGHUP");
+		}
 	}
 }
 
@@ -104,11 +111,13 @@ static void _child_(int signum, siginfo_t *inf, void *ucontext)
 
 	assert(signum == SIGCHLD);
 
-	if (inf->si_pid == pid)
+	if (inf->si_pid == pid) {
 		pid = 0;
+	}
 	if (waitpid(inf->si_pid, NULL, 0) < 0) {
-		if (errno != ECHILD)
+		if (errno != ECHILD) {
 			die("Unable to wait");
+		}
 	}
 }
 
@@ -147,21 +156,24 @@ void pdf_init(int reload_pdf)
 	send_sighup = reload_pdf;
 	running = 1;
 
-	if (pthread_create(&thread, NULL, _thread_, NULL))
+	if (pthread_create(&thread, NULL, _thread_, NULL)) {
 		die("Unable to start PDF thread");
+	}
 
 	act.sa_flags = SA_SIGINFO;
 	act.sa_sigaction = _child_;
 	sigemptyset(&act.sa_mask);
-	if (sigaction(SIGCHLD, &act, NULL))
+	if (sigaction(SIGCHLD, &act, NULL)) {
 		die("Unable to set SIGCHLD action");
+	}
 }
 
 void pdf_cleanup(void)
 {
 	running = 0;
-	if (pthread_join(thread, NULL))
+	if (pthread_join(thread, NULL)) {
 		die("Unable to join PDF thread");
+	}
 	free(filename);
 }
 

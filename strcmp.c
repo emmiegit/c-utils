@@ -7,8 +7,9 @@ int main(int argc, const char *argv[])
 {
 	int cmp;
 
-	if (argc != 3)
+	if (argc != 3) {
 		return 128;
+	}
 
 	cmp = SIGN(strcmp(argv[1], argv[2]));
 	printf("%d\n", cmp);

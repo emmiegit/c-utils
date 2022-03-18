@@ -28,8 +28,9 @@ int main()
 
 	for (;;) {
 		sleep(SLEEP_DELAY);
-		if (kill(pid, 0) < 0 && errno == ESRCH)
+		if (kill(pid, 0) < 0 && errno == ESRCH) {
 			return 0;
+		}
 	}
 }
 

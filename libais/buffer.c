@@ -37,7 +37,6 @@ int buffer_init(struct buffer *const buf, const size_t capacity)
 
 	buf->size = 0;
 	buf->capacity = capacity;
-
 	return 0;
 }
 

@@ -69,10 +69,11 @@ static int compare(const void *_x, const void *_y)
 
 	x = _x;
 	y = _y;
-	if (x->count != y->count)
+	if (x->count != y->count) {
 		return (int)y->count - (int)x->count;
-	else
+	} else {
 		return strcmp(x->ext, y->ext);
+	}
 }
 
 static void resize(void)
@@ -80,10 +81,11 @@ static void resize(void)
 	void *ptr;
 	size_t new_capacity;
 
-	if (exts.capacity == 0)
+	if (exts.capacity == 0) {
 		new_capacity = 8;
-	else
+	} else {
 		new_capacity = exts.capacity * 2;
+	}
 	ptr = realloc(exts.array, new_capacity * sizeof(struct entry));
 	if (!ptr) {
 		perror("Couldn't allocate buffer");
@@ -115,8 +117,9 @@ static void count_file(const char *name)
 			return;
 		}
 	}
-	if (exts.len >= exts.capacity)
+	if (exts.len >= exts.capacity) {
 		resize();
+	}
 
 	/* Add new extension */
 	ent = &exts.array[exts.len++];
@@ -136,8 +139,9 @@ static int scan_cbf(const char *fpath,
 	strcpy(_name, fpath);
 	name = basename(_name);
 
-	if (check_ignore(name))
+	if (check_ignore(name)) {
 		return 0;
+	}
 
 	switch (ftype) {
 	case FTW_F:
@@ -209,8 +213,9 @@ static void print_result(int reverse)
 			printf(format, ent->count, ent->ext);
 		}
 	}
-	if (none_flag)
+	if (none_flag) {
 		printf(format, exts.none, "(none)");
+	}
 }
 
 int main(int argc, char *argv[])
@@ -249,10 +254,13 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	if (optind == argc)
+	if (optind == argc) {
 		scan_dir(".");
-	else for (i = optind; i < argc; i++)
-		scan_dir(argv[i]);
+	} else {
+		for (i = optind; i < argc; i++) {
+			scan_dir(argv[i]);
+		}
+	}
 	print_result(reverse);
 	return ret;
 }

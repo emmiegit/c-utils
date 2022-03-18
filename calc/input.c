@@ -32,11 +32,13 @@ const char *get_line(void)
 {
 	static char *line;
 
-	if (line)
+	if (line) {
 		free(line);
+	}
 	line = readline(PROMPT);
-	if (line && line[0])
+	if (line && line[0]) {
 		add_history(line);
+	}
 	return line;
 }
 

@@ -190,16 +190,19 @@ static void iterate_paths(void)
 		file[off++] = '/';
 
 		while ((dirent = readdir(dh)) != NULL) {
-			if (is_dotdot(dirent->d_name))
+			if (is_dotdot(dirent->d_name)) {
 				continue;
+			}
 
 			strncpy(file + off,
 				dirent->d_name,
 				sizeof(file) - off);
-			if (!is_executable(file))
+			if (!is_executable(file)) {
 				continue;
-			if (!matches(dirent->d_name))
+			}
+			if (!matches(dirent->d_name)) {
 				continue;
+			}
 			puts(file);
 		}
 		closedir(dh);

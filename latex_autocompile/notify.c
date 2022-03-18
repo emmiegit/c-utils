@@ -43,15 +43,18 @@ static void read_event(const struct inotify_event *event)
 {
 	const time_t now = time(NULL);
 
-	if (event->mask == IN_IGNORED)
+	if (event->mask == IN_IGNORED) {
 		return;
-	if (!endswith(event->name, SOURCE_EXTENSION, SOURCE_EXTENSION_LEN))
+	}
+	if (!endswith(event->name, SOURCE_EXTENSION, SOURCE_EXTENSION_LEN)) {
 		return;
+	}
 
 	printf(">> %s", ctime(&now));
 	if (event->mask == IN_CREATE) {
-		if (compile_command(event->name))
+		if (compile_command(event->name)) {
 			return;
+		}
 	} else {
 		puts("Directory was deleted or moved.");
 		exit(0);
@@ -69,22 +72,26 @@ void notify_init(const char *directory, const struct notify_settings *settings)
 	memcpy(&opt, settings, sizeof(struct notify_settings));
 
 	ifd = inotify_init1(IN_CLOEXEC);
-	if (ifd < 0)
+	if (ifd < 0) {
 		die("Unable to initialize inotify");
+	}
 
 	wd = inotify_add_watch(ifd,
 			       directory,
 			       IN_CREATE | IN_DELETE_SELF | IN_MOVE_SELF);
-	if (wd < 0)
+	if (wd < 0) {
 		die("Unable to add watch for \"%s\"", directory);
+	}
 }
 
 void notify_cleanup(void)
 {
-	if (inotify_rm_watch(ifd, wd))
+	if (inotify_rm_watch(ifd, wd)) {
 		die("Unable to remove watch");
-	if (close(ifd))
+	}
+	if (close(ifd)) {
 		die("Unable to stop inotify");
+	}
 }
 
 int notify_read(void)
@@ -94,8 +101,9 @@ int notify_read(void)
 
 	len = read(ifd, buf, sizeof(buf));
 	if (len < 0) {
-		if (errno == EINTR)
+		if (errno == EINTR) {
 			return 0;
+		}
 		perror("Unable to read from inotify");
 		return -1;
 	}

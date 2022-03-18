@@ -38,8 +38,9 @@ int endswith(const char *str, const char *suffix, size_t suflen)
 
 	len = strlen(str);
 	for (i = 0; i < suflen; i++) {
-		if (str[i + len - suflen] != suffix[i])
+		if (str[i + len - suflen] != suffix[i]) {
 			return 0;
+		}
 	}
 	return 1;
 }
@@ -52,12 +53,14 @@ char *replace_ext(const char *str, const char *ext, size_t extlen)
 	len = strlen(str);
 	assert(extlen <= len);
 	new = malloc(len + 1);
-	if (!new)
+	if (!new) {
 		die("Unable to allocate memory");
+	}
 
 	memcpy(new, str, len - extlen);
-	for (i = 0; i < extlen; i++)
+	for (i = 0; i < extlen; i++) {
 		new[i + len - extlen] = ext[i];
+	}
 	new[len] = '\0';
 	return new;
 }
@@ -69,8 +72,9 @@ int compile_command(const char *filename)
 	pid_t pid;
 	int ret;
 
-	if ((pid = FORK()) < 0)
+	if ((pid = FORK()) < 0) {
 		die("Unable to fork");
+	}
 
 	if (pid == 0) {
 		/* We are the child */

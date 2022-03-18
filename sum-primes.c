@@ -10,8 +10,9 @@ static void fill_array(void)
 {
 	size_t i;
 
-	for (i = 0; i < len; i++)
+	for (i = 0; i < len; i++) {
 		primes[i] = i + 2;
+	}
 }
 
 static void sieve_eratosthenes(void)
@@ -22,8 +23,9 @@ static void sieve_eratosthenes(void)
 		size_t i;
 
 		for (i = n + 1; i < len; i++) {
-			if (primes[i] % n == 0)
+			if (primes[i] % n == 0) {
 				primes[i] = -1;
+			}
 		}
 	}
 }
@@ -33,8 +35,9 @@ static void print_primes(void)
 	size_t i;
 
 	for (i = 0; i < len; i++) {
-		if (primes[i] > 0)
+		if (primes[i] > 0) {
 			printf("%ld, ", primes[i]);
+		}
 	}
 	putchar('\n');
 }
@@ -46,8 +49,9 @@ static long sum_primes(void)
 
 	sum = 0;
 	for (i = 0; i < len; i++) {
-		if (primes[i] > 0)
+		if (primes[i] > 0) {
 			sum += primes[i];
+		}
 	}
 	return sum;
 }

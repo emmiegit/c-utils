@@ -30,10 +30,11 @@ void lex_del(void);
 
 static void print_result(double num)
 {
-	if (num == (long)num)
+	if (num == (long)num) {
 		printf("= %ld\n", (long)num);
-	else
+	} else {
 		printf("= %f\n", num);
+	}
 }
 
 void execute_file(void)

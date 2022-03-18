@@ -36,8 +36,9 @@ void die(const char *fmt, ...)
 	vfprintf(stderr, fmt, args);
 	va_end(args);
 
-	if (errno)
+	if (errno) {
 		fputs(strerror(errno), stderr);
+	}
 	putc('\n', stderr);
 	exit(-1);
 }
