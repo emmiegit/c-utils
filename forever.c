@@ -13,8 +13,9 @@ int main(void)
 	ts.tv_nsec = 0;
 
 	for (;;) {
-		if (nanosleep(&ts, NULL))
+		if (nanosleep(&ts, NULL)) {
 			return 1;
+		}
 	}
 	return 0;
 }

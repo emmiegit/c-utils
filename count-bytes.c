@@ -24,13 +24,15 @@ static void count(FILE *fh)
 		}
 
 		/* Count bytes */
-		for (i = 0; i < len; i++)
+		for (i = 0; i < len; i++) {
 			freq[buf[i]]++;
+		}
 		bytes += len;
 
 		/* Quit on EOF */
-		if (feof(fh))
+		if (feof(fh)) {
 			return;
+		}
 	}
 }
 
@@ -42,15 +44,17 @@ static void print_results(void)
 	for (i = 0; i < ARRAY_SIZE(freq); i++) {
 		const unsigned char ch = i;
 
-		if (!freq[i])
+		if (!freq[i]) {
 			continue;
+		}
 
-		if (isgraph(ch) || ch == ' ')
+		if (isgraph(ch) || ch == ' ') {
 			printf("0x%02X (%c) - %lu\n",
 				ch, ch, freq[i]);
-		else
+		} else {
 			printf("0x%02X     - %lu\n",
 				ch, freq[i]);
+		}
 	}
 }
 
@@ -95,8 +99,9 @@ int main(int argc, const char *argv[])
 	} else {
 		len = argc - 1;
 		files = open_files(argc, argv);
-		if (!files)
+		if (!files) {
 			return 1;
+		}
 	}
 
 	/* Read and close files */

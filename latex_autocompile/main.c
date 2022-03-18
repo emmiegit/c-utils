@@ -55,13 +55,15 @@ int main(int argc, char **argv)
 	}
 
 	/* Go to directory */
-	if (optind < argc)
+	if (optind < argc) {
 		directory = argv[optind];
-	else
+	} else {
 		directory = DEFAULT_DIRECTORY;
+	}
 
-	if (chdir(directory))
+	if (chdir(directory)) {
 		die("Unable to change directory to \"%s\"", directory);
+	}
 	printf("Listening on \"%s\"\n", directory);
 
 	/* Initialize */
@@ -75,7 +77,8 @@ int main(int argc, char **argv)
 
 	/* Main loop */
 	for (;;) {
-		if (notify_read())
+		if (notify_read()) {
 			fputs("Inotify event processing failed\n", stderr);
+		}
 	}
 }

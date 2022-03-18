@@ -23,8 +23,9 @@ static void parse_double(const char *spec)
 
 	val = 0;
 	for (i = 0; spec[i]; i++) {
-		if (tolower(spec[i]) == 'd')
+		if (tolower(spec[i]) == 'd') {
 			break;
+		}
 		else if (!isdigit(spec[i]))
 			error(spec);
 
@@ -41,8 +42,9 @@ static void parse_double(const char *spec)
 
 	val = 0;
 	for (; spec[i]; i++) {
-		if (!isdigit(spec[i]))
+		if (!isdigit(spec[i])) {
 			error(spec);
+		}
 
 		val *= 10;
 		val += spec[i] - '0';
@@ -55,15 +57,17 @@ static void parse_int(const char *spec, unsigned int *val)
 	const char *str;
 	size_t i;
 
-	if (tolower(spec[0]) == 'd')
+	if (tolower(spec[0]) == 'd') {
 		str = spec + 1;
-	else
+	} else {
 		str = spec;
+	}
 
 	*val = 0;
 	for (i = 0; str[i]; i++) {
-		if (!isdigit(str[i]))
+		if (!isdigit(str[i])) {
 			error(spec);
+		}
 
 		*val *= 10;
 		*val += str[i] - '0';
@@ -72,12 +76,13 @@ static void parse_int(const char *spec, unsigned int *val)
 
 static void parse_diceroll(const char *spec)
 {
-	if (isdigit(spec[0]))
+	if (isdigit(spec[0])) {
 		parse_double(spec);
-	else if (tolower(spec[0]) == 'd')
+	} else if (tolower(spec[0]) == 'd') {
 		parse_int(spec, &dice);
-	else
+	} else {
 		error(spec);
+	}
 }
 
 /* Usage: roll [[count] "d" dice-size] */

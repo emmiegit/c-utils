@@ -26,10 +26,13 @@ int main(int argc, const char *argv[])
 {
 	int i;
 
-	if (argc == 1)
+	if (argc == 1) {
 		return interactive();
+	}
 
-	for (i = 1; i < argc; i++)
+	for (i = 1; i < argc; i++) {
 		printf("%zu\n", strlen(argv[i]));
+	}
+
 	return 0;
 }

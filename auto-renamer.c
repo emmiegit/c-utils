@@ -24,26 +24,27 @@ struct max_filename {
 
 static unsigned int int_digits(unsigned int x)
 {
-	if (x > 1000000000u)
+	if (x > 1000000000u) {
 		return 9;
-	else if (x > 100000000u)
+	} else if (x > 100000000u) {
 		return 8;
-	else if (x > 10000000u)
+	} else if (x > 10000000u) {
 		return 7;
-	else if (x > 1000000u)
+	} else if (x > 1000000u) {
 		return 6;
-	else if (x > 100000u)
+	} else if (x > 100000u) {
 		return 5;
-	else if (x > 10000u)
+	} else if (x > 10000u) {
 		return 4;
-	else if (x > 1000u)
+	} else if (x > 1000u) {
 		return 3;
-	else if (x > 100u)
+	} else if (x > 100u) {
 		return 2;
-	else if (x > 10u)
+	} else if (x > 10u) {
 		return 1;
-	else
+	} else {
 		return 0;
+	}
 }
 
 static size_t filename_len(const char *str, size_t len)
@@ -52,14 +53,16 @@ static size_t filename_len(const char *str, size_t len)
 
 	end = str + len - 1;
 	while (end >= str) {
-		if (*end == '.')
+		if (*end == '.') {
 			break;
+		}
 		end--;
 	}
-	if (str > end)
+	if (str > end) {
 		return len;
-	else
+	} else {
 		return end - str;
+	}
 }
 
 static void update_max(struct max_filename *maxf, const char *fn)
@@ -73,8 +76,9 @@ static void update_max(struct max_filename *maxf, const char *fn)
 	/* If it's an integer, read its value */
 	total = 0;
 	for (i = 0; i < fnlen; i++) {
-		if (!isdigit(fn[i]))
+		if (!isdigit(fn[i])) {
 			return;
+		}
 
 		total *= 10;
 		total += fn[i] - '0';
@@ -132,8 +136,9 @@ static void read_event(const struct inotify_event *evt)
 	DIR *dh;
 
 	/* Ignore events we don't care about */
-	if (evt->mask != IN_CREATE)
+	if (evt->mask != IN_CREATE) {
 		return;
+	}
 
 	maxf.number = 0;
 	maxf.width = 2;
@@ -146,8 +151,9 @@ static void read_event(const struct inotify_event *evt)
 
 	/* Get highest numbered file */
 	while ((dirent = readdir(dh)) != NULL) {
-		if (!strcmp(dirent->d_name, evt->name))
+		if (!strcmp(dirent->d_name, evt->name)) {
 			continue;
+		}
 		update_max(&maxf, dirent->d_name);
 	}
 
@@ -158,8 +164,9 @@ static void read_event(const struct inotify_event *evt)
 	/* Rename new file */
 	rename_file(evt->name, evt->len, &maxf);
 
-	if (closedir(dh))
+	if (closedir(dh)) {
 		perror("Unable to close directory handle");
+	}
 }
 
 int main(int argc, const char *argv[])
@@ -168,8 +175,9 @@ int main(int argc, const char *argv[])
 	int inotify_fd, wd;
 
 	directory = DEFAULT_DIRECTORY;
-	if (argc > 1)
+	if (argc > 1) {
 		directory = argv[1];
+	}
 
 	if (chdir(directory)) {
 		fprintf(stderr, "Unable to change directory to \"%s\": %s\n",

@@ -37,16 +37,18 @@ int main(int argc, const char *argv[])
 	/* U+0000 to U+007F */
 	cp = 0;
 	for (i = 0; i < 0x7f; i++) {
-		if (cp++ > max_cp)
+		if (cp++ > max_cp) {
 			return 0;
+		}
 		printf("U+%04X  '%c'\n", cp, BIT_8(i));
 	}
 
 	/* U+0080 to U+07FF */
 	for (i = 0; i < 0x1f; i++) {
 		for (j = 0; j < 0x3f; j++) {
-			if (cp++ > max_cp)
+			if (cp++ > max_cp) {
 				return 0;
+			}
 			printf("U+%04X  '%c%c'\n",
 				cp, BIT_110(i), BIT_10(j));
 		}
@@ -56,8 +58,9 @@ int main(int argc, const char *argv[])
 	for (i = 0; i < 0x0f; i++) {
 		for (j = 0; j < 0x3f; j++) {
 			for (k = 0; k < 0x3f; k++) {
-				if (cp++ > max_cp)
+				if (cp++ > max_cp) {
 					return 0;
+				}
 				printf("U+%04X  '%c%c%c'\n",
 					cp,
 					BIT_1110(i),
@@ -72,8 +75,9 @@ int main(int argc, const char *argv[])
 		for (j = 0; j < 0x3f; j++) {
 			for (k = 0; k < 0x3f; k++) {
 				for (l = 0; l < 0x3f; l++) {
-					if (cp++ > max_cp)
+					if (cp++ > max_cp) {
 						return 0;
+					}
 					printf("U+%05X '%c%c%c%c'\n",
 						cp,
 						BIT_11110(i),
