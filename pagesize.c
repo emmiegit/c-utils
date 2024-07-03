@@ -14,7 +14,7 @@ int main(int argc, char **argv)
 	UNUSED(argv);
 
 	if (isatty(STDOUT_FILENO)) {
-		fmt_string = "Page size: %ld bytes.\n";
+		fmt_string = "page size: %ld bytes\n";
 	} else {
 		fmt_string = "%ld";
 	}
